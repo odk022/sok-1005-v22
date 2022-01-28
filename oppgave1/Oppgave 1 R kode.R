@@ -101,3 +101,5 @@ alle_data %>%
   title = "Temperaturer i ulike deler av atmossfæren fra 60 til 90 grader nord ", 
   subtitle = "Endringer i perioden 1978 - 2021 månedlige målinger") +
   theme(axis.title = element_text(size = 8))
+
+
