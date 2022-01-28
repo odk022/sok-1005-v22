@@ -33,6 +33,8 @@ lower_tropos <-
   select(dato, globe) %>% 
   mutate(glidende_snitt = rollmean(globe, 13, fill = NA, align = "center"))
 
+tail(lower_tropos)
+
 # lager plott til datasettet
 lower_tropos %>% 
   ggplot(aes(x=dato, y=globe)) + geom_line(color="lightblue") + theme_bw() +
@@ -41,39 +43,55 @@ lower_tropos %>%
   labs(x = "Tidsperiode", y = "Temperaturvariasjoner i grader Celsius", 
        title = "Gjennomsnittstemperaturer i lavere troposfære", 
        subtitle = "Endringer i perioden 1978 - 2021 månedlige målinger") +
-  theme(axis.title = element_text(size = 8))
+  theme(axis.title = element_text(size = 8)) 
+# annotate(
+#   geom = "curve", x = 2010-01-01, y = 0.4, xend = 2.65, yend = 27,
+#   curvature = .3, arrow = arrow(length = unit(2, "mm"))
+# ) +
+#   annotate(geom = "text", x = 2010-01-01, y = 0.4, label = "
+#            Glidende snitt", hjust = "left")
 
 #forklaring til linje og plott mangler
-
 
 # Oppgave 2:
 # lager en funksjon som henter data og ordner dem
 # koden er hentet fra forelesning høst 2021 og modifisert 
 
-scrape_bake <- function(url, location) {
+# lager en fellesfunksjon for alle operasjoner som utføres:
+# - henting av data
+# - rydding
+
+felles_funksjon <- function(url, location) {
   return(read_table(url) %>%
            .[1:which(.$Year %in% "Year")-1, ] %>%
            clean_names() %>%
-           .[ , c("year", "mo", "no_pol")] %>%  # velger kolonner
+           .[ , c("year", "mo", "no_pol")] %>%  
            mutate(dato = ymd(paste(.$year, .$mo, 1, sep = "-"))) %>%
            mutate_if(is.character, ~as.numeric(.)) %>%
            mutate(nivå = paste0(location)))
 }
+
+# henteliste for data:
 
 url_list <- list("http://vortex.nsstc.uah.edu/data/msu/v6.0/tlt/uahncdc_lt_6.0.txt",
                  "http://vortex.nsstc.uah.edu/data/msu/v6.0/tmt/uahncdc_mt_6.0.txt",
                  "http://vortex.nsstc.uah.edu/data/msu/v6.0/ttp/uahncdc_tp_6.0.txt",
                  "http://vortex.nsstc.uah.edu/data/msu/v6.0/tls/uahncdc_ls_6.0.txt")
 
+
+# navneliste:
 location_list <- list("lower_tropos","mid_tropos", "tropo_pause", "strato")
 
-dframe2 <- map2(url_list, location_list, scrape_bake)
+# samler data, navneliste og fellesfunksjonen:
+
+alle_data <- map2(url_list, location_list, felles_funksjon)
 
 library(plyr)
 
-dframe2 <- ldply(dframe2, data.frame)
+alle_data <- ldply(alle_data, data.frame)
 
-dframe2 %>% 
+# lager fellesplott for alle nivåene i atmossfæren samt gjennomsnitt 
+alle_data %>% 
   select(dato, no_pol, nivå) %>%
   pivot_wider(names_from = nivå, values_from = no_pol) %>% 
   mutate(snitt=rowMeans(.[ , -1])) %>% 
@@ -83,10 +101,10 @@ dframe2 %>%
   dplyr::rename(temperatur = no_pol) %>% 
   ggplot(aes(x=dato, y=temperatur, color=nivå)) + 
   geom_line() + 
-  #aes(size=nivå)
   theme_bw() +
   scale_size_manual(values = c(lower_tropos = 0.5, mid_tropos = 0.5, 
                                snitt = 2, strato = 0.5, tropo_pause = 0.5)) +
-  labs(x = "Tidsperiode", y = "Temperatur i grader Celsius", title = "Temperaturer i ulike deler av atmossfæren fra 60 til 90 grader nord ", 
-       subtitle = "Endringer i perioden 1978 - 2021 månedlige målinger") +
+  labs(x = "Tidsperiode", y = "Temperatur i grader Celsius", 
+  title = "Temperaturer i ulike deler av atmossfæren fra 60 til 90 grader nord ", 
+  subtitle = "Endringer i perioden 1978 - 2021 månedlige målinger") +
   theme(axis.title = element_text(size = 8))
