@@ -43,15 +43,8 @@ lower_tropos %>%
   labs(x = "Tidsperiode", y = "Temperaturvariasjoner i grader Celsius", 
        title = "Gjennomsnittstemperaturer i lavere troposfære", 
        subtitle = "Endringer i perioden 1978 - 2021 månedlige målinger") +
-  theme(axis.title = element_text(size = 8)) 
-# annotate(
-#   geom = "curve", x = 2010-01-01, y = 0.4, xend = 2.65, yend = 27,
-#   curvature = .3, arrow = arrow(length = unit(2, "mm"))
-# ) +
-#   annotate(geom = "text", x = 2010-01-01, y = 0.4, label = "
-#            Glidende snitt", hjust = "left")
+  theme(axis.title = element_text(size = 8))
 
-#forklaring til linje og plott mangler
 
 # Oppgave 2:
 # lager en funksjon som henter data og ordner dem
