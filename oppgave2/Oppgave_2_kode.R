@@ -14,24 +14,28 @@ covid_data <- covid_data %>%
 
 covid_data
 
-stater_fk <- read_excel("oppgave2/stater_forkortelse.xlsx")  
-
-covid_data_fk <- 
-  covid_data %>% 
-  bind_cols(covid_data, stater_fk$s_name) 
-
-
-
 ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
-  geom_point(size = 2, color = "#99CC99") +
+  geom_point(size = 2, color = "#99CC99") + 
   geom_text(aes(label = name), size=3, color = "#999999", nudge_y = 0.5) +
-  labs(
-    title = "Covid-19 deaths since universal adult vaccine eligibility compared with \n vaccination rates", 
-    x = "Share of total population fully vaccinated",
-    y = "avg. monthly deaths per 100.000"
-  ) +
+  xlab("Share of total population fully vaccinated") +
+  ylab("avg. monthly deaths per 100.000") +
+  labs("Covid-19 deaths since universal adult vaccine eligibility compared with \n vaccination rates") + +
   theme_bw() +
   theme(axis.title = element_text(size = 9)) 
+
+
+
+
+
+
+# stater_fk <- read_excel("oppgave2/stater_forkortelse.xlsx")  
+
+#covid_data_fk <- 
+ # covid_data %>% 
+  #bind_cols(covid_data, stater_fk$s_name) 
+
+
+
 
 
 # Ny start
@@ -93,3 +97,5 @@ library(readr)
 # test <- fromJSON("https://www.50states.com/wp-json/")
 # names(test)
 # test$name
+
+
