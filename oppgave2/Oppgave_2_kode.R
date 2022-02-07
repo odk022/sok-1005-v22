@@ -6,6 +6,7 @@
 library(tidyverse)
 library(jsonlite)
 # library(readxl)
+library(scales)
 
 # figuren som skal kopieres finnes her : "https://www.nytimes.com/interactive/2021/12/28/us/covid-deaths.html?referrer=masthead"
 # Oppgaven finnes her: "https://docs.google.com/document/d/e/2PACX-1vSnjNmJKj3q4GOTMWDg99hAwou9hxhYjsg5blfNIvAZRbOwGyjHSz3NkNUApIaIqJnREd99iMVqSKGj/pub"
@@ -14,19 +15,30 @@ covid_data <- fromJSON("https://static01.nyt.com/newsgraphics/2021/12/20/us-coro
 
 
 covid_data <- covid_data %>% 
-  as_tibble %>% 
-  mutate(fully_vaccinated_pct=fully_vaccinated_pct_of_pop*100) # funker ikke når jeg piper den med ggplot
+  as_tibble
+  
+#mutate(fully_vaccinated_pct=fully_vaccinated_pct_of_pop*100) %>% 
+
+covid_data$fully_vaccinated_pct_of_pop <- percent(covid_data$fully_vaccinated_pct_of_pop, accuracy = 1)
+#covid_data$fully_vaccinated_pct_of_pop <- as.numeric(covid_data$fully_vaccinated_pct_of_pop)
+  
+# funker ikke når jeg piper den med ggplot
 
 covid_data
 
-ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
+ggplot(covid_data, aes(x = fully_vaccinated_pct_of_pop, y = deaths_per_100k)) +
   geom_point(size = 2, color = "#99CC99") + 
   geom_text(aes(label = name), size=3, color = "#999999", nudge_y = 0.5) +
+  #scale_x_continuous("fully_vaccinated_pct_of_pop", limits = c(45, 80),
+                                             #breaks = seq(45, 80, 5)) +
+                     
   xlab("Share of total population fully vaccinated") +
   ylab("avg. monthly deaths per 100.000") +
   labs(title="Covid-19 deaths since universal adult vaccine eligibility compared with \n vaccination rates") + 
   theme_bw() +
   theme(axis.title = element_text(size = 9)) 
+
+# Får feilmelding og mister alle verdiene når jeg kjører det som er i #
 
 ## Utfordringer:
 # inndeling x-aksen (45 % - 80 %)
