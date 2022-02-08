@@ -33,8 +33,8 @@ covid_data <- covid_data %>%
   mutate(fully_vaccinated_pct=fully_vaccinated_pct_of_pop*100) %>% 
   rename(stat_fk = X4) 
 
-# Make a plot:
-ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
+# Making a plot:
+pl_death_rate <- ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
   geom_point(size = 2, color = "#99CC99") + 
   geom_text(aes(label = stat_fk), size=3, color = "#999999", nudge_y = 0.5) +
   scale_x_continuous("Share of total population fully vaccinated in %", limits = c(45, 80),
@@ -77,8 +77,8 @@ reg_line
 # This can be interpreted as follow: 1 % increase in vaccination rate would cause a 0.366 %
 # decrease in death rate.
 
-# Makes a plot with a regression line:
-ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
+# Making a plot with a regression line:
+pl_regression <- ggplot(covid_data, aes(x = fully_vaccinated_pct, y = deaths_per_100k)) +
   geom_point(size = 2, color = "#99CC99") + 
   geom_text(aes(label = stat_fk), size=3, color = "#999999", nudge_y = 0.5) +
   scale_x_continuous("Share of total population fully vaccinated in %", limits = c(45, 80),
