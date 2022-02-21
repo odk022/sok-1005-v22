@@ -62,8 +62,7 @@ plot_1
 Reg <- lm(stopp ~ wltp, data = rekkevidde_2)
 Reg
 # The slope of the regression line is 0.8671 and it crosses the y-axis at -26.6450. This can be interpreted like this:
-# A 1 % increase in wltp,increases the stop value with 0.8671 % . This implies that the higher the stated mileage (wltp), 
-# the lower the relative mileage before stopping will be.  
+# A 1 % increase in wltp,increases the stop value with 0.8671 % . 
 
 plot_2 <- plot_1 +
   geom_smooth(method = lm, se = FALSE)
