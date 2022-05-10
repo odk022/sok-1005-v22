@@ -171,7 +171,7 @@ filter(Store_Num == 14) %>%
 filter(Date >= as.Date('2012-04-02') & Date <= as.Date('2012-04-09'))
 sales_14
 
-#filter(Date >= as.Date("2012-04-02"), date <= as.Date("2012-04-09"))
+
 
 # Rail City in Rail County in North State. 
 
