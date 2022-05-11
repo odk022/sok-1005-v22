@@ -80,7 +80,7 @@ df4_em %>%
 
 df5_sales <- read_csv("weekly_sales_10stores.csv")
 df5_sales_2 <- df5_sales %>% 
-  as_tibble %>% 
+  as_tibble %>%
   rename(Store_Num = Store_num) %>% 
   mutate(Date = as.Date(with(df5_sales_2, paste(Year, Month, Day,sep="-")), "%Y-%m-%d"))
 
@@ -105,10 +105,10 @@ df6_weather %>%
 df6_weather$Weather_Date <- 
   as.Date(df6_weather$Weather_Date, format = "%d/%m/%Y") 
 
-df6_weather_2 <-  df6_weather %>% 
-  rename(Date_week = Weather_Date)
+# df6_weather_2 <-  df6_weather %>% 
+#   rename(Date_Week = Weather_Date)
 
-df6_weather_2
+df6_weather
 
 # 
 # # Selecting the variables that seem to be interesting:
@@ -123,28 +123,17 @@ df6_weather_2
 
 # I make one df out of alle df:
 
-df1_df2 <-  
-  full_join(df1_attr_2, df2_crime, by = "County_Name")
-df1_df3 <- 
-  full_join(df1_df2, df3_demo, by = "County_Name")
-df1_df4 <- 
-  full_join(df1_df3, df4_em, by = "County_Name")
-df1_df5 <- 
-  full_join(df1_df4, df5_sales_3, by = "Store_Num")
-All_df <- 
-  left_join(df1_df5, df6_weather_2, by = c("Date" = "Date_week", "Weather_Station"))
-
-
-
 ######
+test_1 <- left_join(df1_attr_2, df6_weather, by = "Weather_Station")
+test_2 <- left_join(test_1, df2_crime, by = "County_Name")
+test_3 <- left_join(test_2, df3_demo, by = "County_Name")
+test_4 <- left_join(test_3, df4_em, by = "County_Name")
+test_5 <- left_join(test_4, df5_sales_3, by = c("Store_Num", "Weather_Date" = "Date"))
 
-test1 <- left_join(df1_attr_2, df2_crime, by = "County_Name")
-test2 <- left_join(test1, df3_demo, by = "County_Name")
-test3 <- left_join(test2, df4_em, by = "County_Name")
-test4 <- left_join(test3, df5_sales_3, by = "Store_Num")
-test5 <- left_join(test4, df6_weather_2, by = c("Date" = "Date_week", "Weather_Station"))
+All_df <- test_5 %>% 
+  rename("Date" = "Weather_Date")
 
-#select(., Store_Name, Store_Num, Store_City, County_Name, Store_State,  Weather_Station, Store_Location
+
  
 # OPPGAVE 2:
 # Dataene skal benyttes til en ukentlig salgsrapport til et enkelt utsalg. Gi noen eksempler på hva innholdet
@@ -152,7 +141,7 @@ test5 <- left_join(test4, df6_weather_2, by = c("Date" = "Date_week", "Weather_S
 # eventuelle tabeller.
 
 # Velger utsalg nr 14
-# velger uke nr ?
+# velger uke nr 20
 # lokasjon - stat, fylke, beliggenhet(skole, senter)
 # Omsetning totalt (Sales)
 # Omsetning pr varegruppe (INV_NUMBER). Grafikk
@@ -162,18 +151,24 @@ test5 <- left_join(test4, df6_weather_2, by = c("Date" = "Date_week", "Weather_S
 
 
 
-# I choose stor no 14:
+# I choose store no 14:
+# name of Store:
 
-sales_14 <- df5_sales_3 %>% 
-filter(Store_Num == 14) %>% 
-#filter(between(Date, as.Date('2012-04-02'), as.Date('2012-04-09')))
+#week 14
+# sales_14_1 <- df5_sales_3 %>% 
+#   filter(Date == '2012-04-01', Store_Num == 14)
+# 
+# all_df_1 <-All_df %>% 
+#   filter(Date == '2012-04-01', Store_Num == 14)
 
-filter(Date >= as.Date('2012-04-02') & Date <= as.Date('2012-04-09'))
-sales_14
+# I choose week 20
+sales_14 <-All_df %>% 
+  filter(Weather_Week == 20, Store_Num == 14) %>% 
+  select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold, 
+         Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) %>% 
+  group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
+  summarise(Sales)
 
-
-
-# Rail City in Rail County in North State. 
 
 # OPPGAVE 3:
 # Dataene skal benyttes til en månedlig salgsrapport på aggregert nivå til konsernledelsen. 
@@ -190,7 +185,16 @@ sales_14
 # Belyse om det er sammenheng mellom demo i området og omsetning
 # Belyse om det er sammenheng mellom crime i området og omsetning
 
-##
+
+
+
+# OPPGAVE 4:
+# Kan dataene benyttes til å planlegge nye utsalg? Dersom konsernledelsen ønsker å 
+# etablere et nytt utsalg, hvordan kan de benytte disse dataene til å finne den beste lokasjonen?
+  
+
+
+## Til presentasjonen:
 # Innovative analytiske grep
 # - sammenheng salg og rammebetingelser(f.eks, lokasjon,demo,)
 # - hva selger hvor?
