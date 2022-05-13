@@ -1,7 +1,15 @@
 library(tidyverse)
 library(lubridate)
+library(stringr)
+
 
 # downloading data
+
+
+
+
+
+
 
 # I change the names of the datatables:
 # AppWichStoreAttributes = df1_attr
@@ -105,9 +113,6 @@ df6_weather %>%
 df6_weather$Weather_Date <- 
   as.Date(df6_weather$Weather_Date, format = "%d/%m/%Y") 
 
-# df6_weather_2 <-  df6_weather %>% 
-#   rename(Date_Week = Weather_Date)
-
 df6_weather
 
 # 
@@ -145,11 +150,13 @@ All_df <- test_5 %>%
 # lokasjon - stat, fylke, beliggenhet(skole, senter)
 # Omsetning totalt (Sales)
 # Omsetning pr varegruppe (INV_NUMBER). Grafikk
+## hvorfor selger ulike varegrupper godt i ulike peroder, feks is om vinteren
 # Hvor mye utgjør hver varegruppe av salget. Grafikk
 # Sammenlikning med samme uke året før og uken før. Grafikk
 # Fortjenste pr varegruppe (Profit)
-
-
+# kan demo/andre variabler bidra til forklaring
+# avgrensing
+# går det bra eller dårlig, og hvorfor?
 
 # I choose store no 14:
 # name of Store:
@@ -167,18 +174,32 @@ sales_14 <-All_df %>%
   select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold, 
          Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) %>% 
   group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
-  summarise(Sales)
+  summarise(Sales) %>% 
+  ungroup()
+  
+# sum of variables:
+  sum(sales_14$Sales)
+  sum(sales_14$Profit)
+  max(sales_14$Sales)
 
-
-# OPPGAVE 3:
+# Grouping the sales:
+# Extract matching rows with str_detect
+  test <- sales_14[str_detect(sales_14$Description, c("REGULAR", "MINI")), ]  
+  head(test)
+  
+  # test_1 <- sales_14[sales_14$Description %in% c(str_detect(sales_14$Description, "REGULAR"), str_detect(sales_14$Description, "MINI")), ]
+  # head(test_1)
+  
+  # OPPGAVE 3:
 # Dataene skal benyttes til en månedlig salgsrapport på aggregert nivå til konsernledelsen. 
 # Gi noen eksempler på hva innholdet i en slik langsiktig konsernrapport bør inneholde. 
 # Begrunn dine valg og tankegangen bak figurer og eventuelle tabeller.
-
 # Gjelder alle utsalg
 # Månedsdata - lage data for alle mnd slik at man kan se utvikling, totalt og hvert utsalg. Grafikk
 # Omsetning totalt utvikling(Sales) Grafikk
+# Hvilke varegrupper gir mest/minst profitt
 # Omsetning pr varegruppe (INV_NUMBER). Grafikk
+## slå sammen varegruppe, evt andel av omsetning
 # Hvor mye utgjør hver varegruppe av salget. Grafikk
 # Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå sammen 
 # Belyse om det er sammenheng mellom ledighet i området og omsetning
@@ -191,7 +212,9 @@ sales_14 <-All_df %>%
 # OPPGAVE 4:
 # Kan dataene benyttes til å planlegge nye utsalg? Dersom konsernledelsen ønsker å 
 # etablere et nytt utsalg, hvordan kan de benytte disse dataene til å finne den beste lokasjonen?
-  
+# se analysen under pkt 3
+# reproduserbar analyse
+# oppdatering av data
 
 
 ## Til presentasjonen:
