@@ -1,14 +1,42 @@
+# Loading necessary packages:
 library(tidyverse)
 library(lubridate)
-library(stringr)
-
 
 # downloading data
+file_location <- paste0(getwd(), '/')
 
+AppWichStoreAttributes <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/26afd5e7-90b1-4301-ac5e-5905b38c4ec2/file_downloaded"
+dest <- paste0(file_location, "AppWichStoreAttributes.csv")
+download.file(AppWichStoreAttributes, dest)
 
+county_crime <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/3691994e-2874-4ee6-b215-12e130c96175/file_downloaded"
+dest <- paste0(file_location, "county_crime.csv")
+download.file(county_crime, dest)
 
+county_demographic <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/527e7486-7233-460a-99e0-3529b7cd7d49/file_downloaded"
+dest <- paste0(file_location, "county_demographic.csv")
+download.file(county_demographic, dest)
 
+county_employment <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/846ac757-721e-4fd9-a414-5871f60de093/file_downloaded"
+dest <- paste0(file_location, "county_employment.csv")
+download.file(county_employment, dest)
 
+WEEKLY_SALES_10STORES <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/b963fdd1-0df9-4257-bd62-65256ec9d57c/file_downloaded"
+dest <- paste0(file_location, "WEEKLY_SALES_10STORES.csv")
+download.file(WEEKLY_SALES_10STORES, dest)
+
+WEEKLY_WEATHER <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/b8708b3c-c5e8-456e-83f4-9f23f472a840/file_downloaded"
+dest <- paste0(file_location, "WEEKLY_WEATHER.csv")
+download.file(WEEKLY_WEATHER, dest)
+
+# Removes all noise since we have finished downloading
+rm(list=ls()) 
 
 
 # I change the names of the datatables:
@@ -19,36 +47,52 @@ library(stringr)
 # weekly_sales_10stores = df5_sales
 # weekly_weather = df6_weather
 
-# Store Attributes:
-# I load the file AppWichStoreAttributes and call it df1_attr. I change the names
-# of Store_County and Store_Weather_Station.
+library(readr)
+df1_attr <- AppWichStoreAttributes <- read_csv("AppWichStoreAttributes.csv")
+head(df1_attr)
 
-df1_attr <- read_csv("AppWichStoreAttributes.csv")
+df2_crime <- county_crime <- read_csv("county_crime.csv")
+head(df2_crime)
+
+df3_demo <- county_demographic <- read_csv("county_demographic.csv")
+head(df3_demo)
+
+df4_em <- county_employment <- read_csv("county_employment.csv")
+head(df4_em)
+
+df5_sales <- WEEKLY_SALES_10STORES <- read_csv("WEEKLY_SALES_10STORES.csv")
+head(df5_sales)
+
+df6_weather <- WEEKLY_WEATHER <- read_csv("WEEKLY_WEATHER.csv")
+head(df6_weather)
+
+# I go through the dfs and make necessary changes:
+
+# df1_attr:
+# I change the names of Store_County and Store_Weather_Station.
+
 df1_attr_2 <-df1_attr %>%
-  as_tibble() %>%
   rename(County_Name = Store_County, Weather_Station = Store_Weather_Station)
 df1_attr_2
 
 
-# Crime rate:
-# I load the file county_crime and call it df2_crime:
-df2_crime <- read_csv("county_crime.csv")
-df2_crime %>% 
-  as_tibble() 
-  
+# df2_crime:
+# No changes
+
+####
+# For further analysis  
 # I select the crime rates from this df  
 #   select(County_Name, County_Total_Crime_Rate, County_Violent_Rate, 
 #          County_Property_Rate, County_Society_Rate, County_Other_Rate) 
 # df2_crime_2
 
 
-# demografic groups:
-# I load the file county_demographic and call it df3_demo:
+# df3_demo:
+# No changes 
 
-df3_demo <- read_csv("county_demographic.csv")
-df3_demo %>% 
-  as_tibble() 
 
+####
+# For further analysis
 # I use the four largest groups and sum the small groups in to one category "All_Other_Groups". 
 
 # df3_demo_2 <- df3_demo %>% 
@@ -70,56 +114,41 @@ df3_demo %>%
 
 
 
-# Employment:
-# I load the file county_employment and call it df4_em:
-
-df4_em <- read_csv("county_employment.csv")
-df4_em %>% 
-  as_tibble()
+# df4_em:
+# No changes
  
 
-
-# Sales:
-# I load the file weekly_sales_10stores and call it df5_sales:
-# I rename the store number column
-
-# Formatting the date
+# df5_sales:
+# I rename the store number column.
 # Some dates are missing in the Date column, I use the other date columns
 
-df5_sales <- read_csv("weekly_sales_10stores.csv")
 df5_sales_2 <- df5_sales %>% 
-  as_tibble %>%
   rename(Store_Num = Store_num) %>% 
-  mutate(Date = as.Date(with(df5_sales_2, paste(Year, Month, Day,sep="-")), "%Y-%m-%d"))
+  mutate(Date = as.Date(with(df5_sales, paste(Year, Month, Day,sep="-")), "%Y-%m-%d"))
 
-  
 # Removing unnecessary columns:
 df5_sales_3 <- 
   subset (df5_sales_2, select = -c(Year, Month, Day)) 
-
 df5_sales_3
 
-# df5_sales_2$Date <-
-#   as.Date(df5_sales_2$Date, format = "%d/%m/%Y")
 
 
-# Weather:
-# I load the file weekly_weather and call it df6_weather 
-df6_weather <- read_csv("weekly_weather.csv")
-df6_weather %>%
-  as_tibble
+# df6_weather:
 
 # Formatting the weather date
 df6_weather$Weather_Date <- 
   as.Date(df6_weather$Weather_Date, format = "%d/%m/%Y") 
-
 df6_weather
 
-# 
+####
+# For further analysis:
 # # Selecting the variables that seem to be interesting:
 # df6_weather_2 <- df6_weather %>% 
 #   select(Weather_Station, Weather_Date, Weather_Week, Weather_Bad_Weather_Week)
 # df6_weather_2
+
+
+
 
 # OPPGAVE 1:
 # Den første oppgaven er å skrive R kode som slår sammen de 6 datasettene til et stort datasett.
@@ -128,16 +157,15 @@ df6_weather
 
 # I make one df out of alle df:
 
-######
-test_1 <- left_join(df1_attr_2, df6_weather, by = "Weather_Station")
-test_2 <- left_join(test_1, df2_crime, by = "County_Name")
-test_3 <- left_join(test_2, df3_demo, by = "County_Name")
-test_4 <- left_join(test_3, df4_em, by = "County_Name")
-test_5 <- left_join(test_4, df5_sales_3, by = c("Store_Num", "Weather_Date" = "Date"))
+df1_df2 <- left_join(df1_attr_2, df6_weather, by = "Weather_Station")
+df1_df3 <- left_join(df1_df2, df2_crime, by = "County_Name")
+df1_df4 <- left_join(df1_df3, df3_demo, by = "County_Name")
+df1_df5 <- left_join(df1_df4, df4_em, by = "County_Name")
+All_df <- left_join(df1_df5, df5_sales_3, by = c("Store_Num", "Weather_Date" = "Date"))
 
-All_df <- test_5 %>% 
+All_df <- All_df %>% 
   rename("Date" = "Weather_Date")
-
+All_df
 
  
 # OPPGAVE 2:
@@ -158,15 +186,7 @@ All_df <- test_5 %>%
 # avgrensing
 # går det bra eller dårlig, og hvorfor?
 
-# I choose store no 14:
-# name of Store:
-
-#week 14
-# sales_14_1 <- df5_sales_3 %>% 
-#   filter(Date == '2012-04-01', Store_Num == 14)
-# 
-# all_df_1 <-All_df %>% 
-#   filter(Date == '2012-04-01', Store_Num == 14)
+# I choose store no 14 and week 20:
 
 # I choose week 20
 sales_14 <-All_df %>% 
@@ -176,19 +196,141 @@ sales_14 <-All_df %>%
   group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
   summarise(Sales) %>% 
   ungroup()
-  
+
+
+
 # sum of variables:
-  sum(sales_14$Sales)
-  sum(sales_14$Profit)
-  max(sales_14$Sales)
+sum(sales_14$Sales)
+sum(sales_14$Profit)
+max(sales_14$Sales)
+
+
+# Sorting the goods after price groups:
+
+sales_price_gr <- sales_14 %>% 
+  group_by(price_group = ifelse(Price <= 0, "price_0", 
+                         ifelse(Price > 0 & Price <= 1.0, "price_1", 
+                         ifelse(Price > 1 & Price <= 2, "price_2", 
+                         ifelse(Price > 2 & Price <= 3, "price_3", 
+                         ifelse(Price > 3 & Price <= 4, "price_4", 
+                         ifelse(Price > 4 & Price <= 5, "price_5", 
+                         ifelse(Price > 5 & Price <= 6, "price_6", 
+                         ifelse(Price > 6 & Price <= 7, "price_7", 
+                         ifelse(Price > 7 & Price <= 8.0, "price_8", "over_8")))))))))) %>% 
+  summarise(Sold, Price, Sales, Profit)
+
+
+
+sales_price_gr <-
+  sales_price_gr %>%
+  select(price_group, Sold, Price, Sales, Profit) %>%
+  filter(price_group >= 0) %>%
+  group_by(price_group) %>%
+  summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
+
+  sum(sales_price_gr$Tot_profit)
+  sum(sales_price_gr$Tot_sales)
+
+figure_1 <-
+sales_price_gr %>% 
+ggplot(aes(x=price_group, y = Tot_sales))+
+geom_bar(stat= "identity", fill = "steelblue") +
+theme_classic()
+figure_1
+
+
+
+
+
 
 # Grouping the sales:
-# Extract matching rows with str_detect
-  test <- sales_14[str_detect(sales_14$Description, c("REGULAR", "MINI")), ]  
-  head(test)
+# Extract matching rows with str_detect - not finished
+sales_gr <- sales_14[str_detect(sales_14$Description, c("REGULAR", "MINI")), ]  
+head(sales_gr)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#test_14 <- sales_14 %>% 
+  #mutate(sales_14, price_1 = sales_14, Price > 0 & Price <= 1.0)
+
+
+
+
+
+
+
+
+
+
+
+#mutate(test, "Other" == sum("other"))
+
+#sum(test$Sales) %in% test$price_class = "Other"
+
+
+
+# library(data.table)
+# library(janitor)
+# 
+# test_t <- transpose(test)
+# 
+# rownames(test_t) <- colnames(test)
+# colnames(test_t) <- rownames(test)
+# 
+# 
+# 
+# test_t %>% 
+#   as_tibble 
+# 
+# sapply(test_t, class)
+# 
+# 
+# as.numeric(test_t$"1")
+# 
+# glimpse(test_t)
+# 
+# row_to_names(test_t, 1, remove_rows_above = TRUE)
+# test_t %>% 
+#   mutate_if(is.character, as.factor)
+
+
+
+
+#test_p <- pivot_wider(test, names_from = price_class, values_from = c(Price, Sales, Sold))
+
+# test_t %>% 
+#   mutate_if(is.character, as.numeric)
+# test_t
+# sum(test_t[1:6])
+
+
+
+
+
+
+
+
+
+
+
+glimpse(test_t)
+
   
-  # test_1 <- sales_14[sales_14$Description %in% c(str_detect(sales_14$Description, "REGULAR"), str_detect(sales_14$Description, "MINI")), ]
-  # head(test_1)
   
   # OPPGAVE 3:
 # Dataene skal benyttes til en månedlig salgsrapport på aggregert nivå til konsernledelsen. 
@@ -206,6 +348,14 @@ sales_14 <-All_df %>%
 # Belyse om det er sammenheng mellom demo i området og omsetning
 # Belyse om det er sammenheng mellom crime i området og omsetning
 
+# sales_mnd <-All_df %>%
+#   filter(Weather_Week >= 20, Weather_Week <= 23) %>%
+#   select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold,
+#          Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) %>%
+#   group_by(Store_Num) %>%
+#   summarise(Sales)
+# 
+# sales_mnd
 
 
 
@@ -217,8 +367,5 @@ sales_14 <-All_df %>%
 # oppdatering av data
 
 
-## Til presentasjonen:
-# Innovative analytiske grep
-# - sammenheng salg og rammebetingelser(f.eks, lokasjon,demo,)
-# - hva selger hvor?
+
 
