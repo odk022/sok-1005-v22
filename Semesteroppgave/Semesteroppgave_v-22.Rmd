@@ -1,0 +1,355 @@
+---
+title: "Semesteroppgave SOK-1005-v22"
+author: "Oddmund Klæboe"
+date: "18 5 2022"
+output: html_document
+---
+Loading packages:
+
+```{r downloading packages}
+library(tidyverse)
+library(lubridate)
+library(knitr)
+library(kableExtra)
+
+```
+
+
+Downloading data
+```{r downloads}
+file_location <- paste0(getwd(), '/')
+
+AppWichStoreAttributes <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/26afd5e7-90b1-4301-ac5e-5905b38c4ec2/file_downloaded"
+dest <- paste0(file_location, "AppWichStoreAttributes.csv")
+download.file(AppWichStoreAttributes, dest)
+
+county_crime <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/3691994e-2874-4ee6-b215-12e130c96175/file_downloaded"
+dest <- paste0(file_location, "county_crime.csv")
+download.file(county_crime, dest)
+
+county_demographic <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/527e7486-7233-460a-99e0-3529b7cd7d49/file_downloaded"
+dest <- paste0(file_location, "county_demographic.csv")
+download.file(county_demographic, dest)
+
+county_employment <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/846ac757-721e-4fd9-a414-5871f60de093/file_downloaded"
+dest <- paste0(file_location, "county_employment.csv")
+download.file(county_employment, dest)
+
+WEEKLY_SALES_10STORES <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/b963fdd1-0df9-4257-bd62-65256ec9d57c/file_downloaded"
+dest <- paste0(file_location, "WEEKLY_SALES_10STORES.csv")
+download.file(WEEKLY_SALES_10STORES, dest)
+
+WEEKLY_WEATHER <-
+  "https://data.mendeley.com/public-files/datasets/6htjnfs78b/files/b8708b3c-c5e8-456e-83f4-9f23f472a840/file_downloaded"
+dest <- paste0(file_location, "WEEKLY_WEATHER.csv")
+download.file(WEEKLY_WEATHER, dest)
+
+# Removes all noise since we have finished downloading
+rm(list=ls()) 
+```
+**I change the names of the datatables:**  
+- AppWichStoreAttributes = df1_attr  
+- county_crime = df2_crime  
+- county_demographic = df3_demo  
+- county_employment = df4_em  
+- weekly_weather = df5_weather  
+- weekly_sales_10stores = df6_sales  
+
+I go through the dfs and make necessary changes in names and formats:
+
+```{r reading_and_naming_dfs}
+
+df1_attr <- AppWichStoreAttributes <- read_csv("AppWichStoreAttributes.csv")
+```
+I change the names of Store_County and Store_Weather_Station:
+```{r}
+df1_attr_2 <-df1_attr %>%
+  rename(County_Name = Store_County, Weather_Station = Store_Weather_Station)
+head(df1_attr_2)
+
+df2_crime <- county_crime <- read_csv("county_crime.csv")
+head(df2_crime)
+
+df3_demo <- county_demographic <- read_csv("county_demographic.csv")
+head(df3_demo)
+
+df4_em <- county_employment <- read_csv("county_employment.csv")
+head(df4_em)
+
+df5_weather <- WEEKLY_WEATHER <- read_csv("WEEKLY_WEATHER.csv")
+head(df5_weather)
+```
+Formatting the weather date:
+```{r}
+df5_weather$Weather_Date <- 
+  as.Date(df5_weather$Weather_Date, format = "%d/%m/%Y") 
+df5_weather
+
+df6_sales <- WEEKLY_SALES_10STORES <- read_csv("WEEKLY_SALES_10STORES.csv")
+head(df6_sales)
+```
+I rename the store number column.
+Some dates are missing in the Date column, I use the other date columns.
+```{r}
+df6_sales_2 <- df6_sales %>% 
+  rename(Store_Num = Store_num) %>% 
+  mutate(Date = as.Date(with(df6_sales, paste(Year, Month, Day,sep="-")), "%Y-%m-%d"))
+```
+Removing unnecessary columns:
+```{r}
+df6_sales_3 <- 
+  subset (df6_sales_2, select = -c(Year, Month, Day)) 
+```
+Changing the letters in Description:
+```{r}
+df6_sales_3$Description = str_to_title(df6_sales_3$Description)
+df6_sales_3
+```
+
+### **Oppgave 1: Slå sammen alle datasettene**
+
+I make one df out of alle df by using the function left_join():
+```{r merging dfs}
+df1_df2 <- left_join(df1_attr_2, df5_weather, by = "Weather_Station")
+df1_df3 <- left_join(df1_df2, df2_crime, by = "County_Name")
+df1_df4 <- left_join(df1_df3, df3_demo, by = "County_Name")
+df1_df5 <- left_join(df1_df4, df4_em, by = "County_Name")
+All_df <- left_join(df1_df5, df6_sales_3, by = c("Store_Num", "Weather_Date" = "Date"))
+
+All_df <- All_df %>% 
+  rename("Date" = "Weather_Date")
+All_df
+
+```
+
+
+### **Oppgave 2: Lag en ukesrapport for et utsalg**
+
+```{r links_to_name_and_period}
+Store_No_Nm <- All_df %>% 
+  filter(Store_Num == 14)  
+Store_No_Nm[1,2] 
+Store_No_Nm[1,1]
+
+Week <- All_df %>% 
+  filter(Weather_Week == 20) 
+Week[1,22]
+
+```
+
+
+This is a weekly report for store no `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` for the period week no `r Week[1,22]` which gives a
+overview and assessment of the results. 
+
+```{r selecting variables for week report}
+sales_14_20 <-All_df %>% 
+  filter(Weather_Week == 20, Store_Num == 14) %>% 
+  select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold, 
+         Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) %>% 
+  group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
+  summarise(Sales) %>% 
+  ungroup()
+
+# Dette må jobbes med
+#sales_most_item <-
+ # subset(sales_14_20, Sales = max(sales_14_20$Sales))
+
+#sales_most_item[1,1]
+
+# selecting the week before for comparing development in Sales and Profit:
+sales_14_19 <-All_df %>% 
+  filter(Weather_Week == 19, Store_Num == 14) %>% 
+  select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold, 
+         Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) %>%
+  group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
+  summarise(Sales) %>% 
+  ungroup()
+
+# sum of variables:
+sum(sales_14_19$Sales)
+sum(sales_14_20$Sales)
+sales_change = round(100 * ((sum(sales_14_20$Sales)/sum(sales_14_19$Sales)-1)),1)
+sales_change
+
+sum(sales_14_19$Profit)
+sum(sales_14_20$Profit)
+profit_change = round(100 * ((sum(sales_14_20$Profit)/sum(sales_14_19$Profit)-1)),1)
+profit_change
+
+
+
+```
+##### **Comment**  
+Total sales during the period were $ `r sum(sales_14_20$Sales)`. This is a change of `r sales_change` percent compared to the week before.
+  
+    
+    
+#### **Sorting the goods after price groups:**
+Due to the large breadth of the product range, it has been chosen to take the product prices as a starting point and group them.
+```{r sorting price in groups}
+sales_price_gr <- sales_14_20 %>% 
+  group_by(price_group = ifelse(Price <= 1.0, "price_$1", 
+                         ifelse(Price > 1 & Price <= 2, "price_$2", 
+                         ifelse(Price > 2 & Price <= 3, "price_$3", 
+                         ifelse(Price > 3 & Price <= 4, "price_$4", 
+                         ifelse(Price > 4 & Price <= 5, "price_$5", 
+                         ifelse(Price > 5 & Price <= 6, "price_$6", 
+                         ifelse(Price > 6 & Price <= 7, "price_$7", 
+                         ifelse(Price > 7 & Price <= 8.0, "price_$8", "price_over_$8"))))))))) %>% 
+  summarise(Sold, Price, Sales, Profit)
+
+
+sales_price_gr <-
+  sales_price_gr %>%
+  select(price_group, Sold, Price, Sales, Profit) %>%
+  filter(price_group >= 0) %>%
+  group_by(price_group) %>%
+  summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
+
+# Total sales and profit:
+sum(sales_price_gr$Tot_sales)
+max(sales_price_gr$Tot_sales)  
+
+sum(sales_price_gr$Tot_profit)
+max(sales_price_gr$Tot_profit)
+
+
+sales_most <- 
+  subset(sales_price_gr, Tot_sales == max(sales_price_gr$Tot_sales))
+
+
+profit_most <- 
+  subset(sales_price_gr, Tot_profit == max(sales_price_gr$Tot_profit))
+```
+
+#### **Share of sales and profit per pricegroup:**
+```{r shares of sales and profit}
+# share of sales and profit per pricegroup:
+sales_share <-
+  sales_price_gr %>% 
+  mutate(Share_sales = round(100 *(sales_price_gr$Tot_sales/sum(sales_price_gr$Tot_sales)), 1),
+         Share_profit = round(100 *(sales_price_gr$Tot_profit/sum(sales_price_gr$Tot_profit)),1)) %>% 
+  select(price_group, Tot_sold, Tot_sales, Share_sales, Tot_profit, Share_profit)
+
+Shares_most <- 
+  subset(sales_share, Share_sales == max(sales_share$Share_sales)) 
+
+``` 
+```{r table 1}
+Goods_shares <- sales_share[1:9, 1:6]
+  kable(Goods_shares, caption = "Table 1: Amount and shares for Sale and Profit")
+```
+
+
+  
+#### **Making a plot of sales per pricegroup:**
+```{r figure 1}
+figure_1 <-
+sales_price_gr %>% 
+ggplot(aes(x=price_group, y = Tot_sales))+
+  geom_bar(stat= "identity", fill = "steelblue") +
+  geom_text(aes(label=Tot_sales), vjust= -0.3, size=3.5)+
+  labs(title = "Figure 1: Sales per pricegroup", x = "Pricegroups in $", y = "Total Sales per pricegoup",
+        caption = "Figure 1 shows how Sales are distributed across pricegroups. For example' price_$5 mean goods that cost from $4 to $5.") +
+  theme_classic()
+figure_1
+
+```
+
+##### **Comment**
+We see from Figure 1 that the highest sales are of goods in the price group `r sales_most[1,1]`. Total Sales are $`r sales_most[1,2]`.
+The first price group has negative sales figures. The reason for this is that it also contains refunds etc.   
+  
+  
+  
+  
+  
+  
+#### **Making a plot of shares of sales per pricegroup:**
+```{r figure 1a share of sales}
+figure_1a <-
+  sales_share %>% 
+  ggplot(aes(x=price_group, y = Share_sales))+
+  geom_bar(stat= "identity", fill = "steelblue") +
+  geom_text(aes(label=Share_sales), vjust= -0.3, size=3.5)+
+  labs(title = "Figure 1a: Shares of Sales per pricegroup", x = "Pricegroups in $", y = "Share of Sales per pricegoup",
+       caption = "Figure 1 shows how shares of Sales are distributed across pricegroups.") +
+  theme_classic()
+figure_1a
+```
+Comments:  
+We see from Figure 1a that the highest share of sales are of goods in the price group `r Shares_most[1,1]`. This price group has `r Shares_most[1,4]` per cent of all sales.  
+  
+  
+#### **Making a plot of profit per pricegroup:**
+```{r figure 2 profit}
+figure_2 <-
+  sales_price_gr %>% 
+  ggplot(aes(x=price_group, y = Tot_profit))+
+  geom_bar(stat= "identity", fill = "steelblue") +
+  geom_text(aes(label=Tot_profit), vjust= -0.3, size=3.5)+
+  labs(title = "Figure 2: Profit per pricegroup", x = "Pricegroups in $", y = "Total Profit per pricegoup",
+       caption = "Figure 2 shows how Profit are distributed across pricegroups. For example price_$5 mean goods that cost from $4 to $5.") +
+  theme_classic()
+figure_2
+```
+
+Vi ser av figur 2 at den største fortjenesten oppnås av omsetningen i prisgruppen `r profit_most[1,1]`. Den totale fortjenesten her er $`r profit_most[1,4]`. Den første prisgruppen er negativ. Årsaken til dette er at den også inneholder refusjoner mm. som vil 
+påvirke fortjenesten negativt.
+
+
+ Det var størst omsetning av (lenke). enkeltvare
+Dette utgjorde (lenke) prosent av totalomsetningen.
+
+Vareutvalget er veldig bredt, og det er derfor gjort en gruppering etter priser. Denne viser at (lenke) prosent av
+omsetningen omfatter varer som koster mellom $(lenke)og(lenke). Det er størst antall salg av varer i prisgruppen fra
+$ (lenke) til $(lenke). Vi finner (lenke til varer) i denne gruppen.
+
+Den totale fortjeneste (Profit) i uke 20(lenke) var $`r sum(sales_14_20$Profit)`. Størst fortjeneste var det på (lenke).
+Dette utgjorde (lenke) prosent av den totale fortjenesten.
+Figur 2 viser hvordan fortjenesten fordeler seg på prisgruppene.
+Denne viser at (lenke) prosent av fortjenesten omfatter varer som koster mellom $(lenke)og(lenke). Den største fortjenesten
+var det innen prisgruppen fra $(lenke) til $(lenke).   
+
+#### **The best-selling items**  
+Hvilke varer finner vi i gruppen med størst omsetning.
+Vi finner (lenke til varer) i denne gruppen.
+
+```{r}
+Goods_most<- sales_14_20 %>%
+  filter(Price > 4 & Price <= 5, Sold > 10) %>% 
+  arrange(desc(Sales))
+
+sum(Goods_most$Sold)
+sum(Goods_most$Sales)
+sum(Goods_most$Profit)
+```
+
+```{r}
+Goods_most <- Goods_most[1:10, ]
+  kable(Goods_most, caption = "Table 2: Most sold goods")
+```
+
+
+Hvordan gjøre tabellen finere?
+
+
+Tabell 2 viser de 10 varene som selger mest.Sales for these 10 are total $ `r sum(Goods_most$Sales)` og utgjør `r round(100 *(sum(Goods_most$Sales)/sum(sales_14_20$Sales)),1)` prosent av totalomsetningen.
+
+Det framgår av tabell 2 at det selges mest av `r Goods_most[1,2]`. `r Goods_most[1,4]` enheter ble solgt, og det utgjør $ `r Goods_most[1,8]` i omsetning. Omsetningen av `r Goods_most[1,2]` utgjorde `r round(100 *(Goods_most[1,8]/sum(sales_14_20$Sales)),1)` prosent av totalomsetningen.  
+
+På andre plass følger `r Goods_most[2,2]` med `r Goods_most[2,4]` enheter og $ `r Goods_most[2,8]` i omsetning og som tredje rangert `r Goods_most[3,2]` med `r Goods_most[3,4]` enheter og $ `r Goods_most[3,8]` i omsetning.  
+  
+  
+
+
+#### **Most profitable items**
+`r Goods_most[1,2]` is also the most profitable sold item. The profit is $ `r Goods_most[1,6]`. This amounts to  `r round(100 *(Goods_most[1,6]/sum(sales_14_20$Profit)),1)` percent of total profit.
+
+(kan ikke lenkes!)
+As shown in the table1, no costs are stated for `r Goods_most[3,2]`. This means that we can not save the profit for this item.
