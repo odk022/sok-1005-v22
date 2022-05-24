@@ -322,35 +322,7 @@ Goods_most[1,2]
 
 
 
-#mutate(test, "Other" == sum("other"))
 
-#sum(test$Sales) %in% test$price_class = "Other"
-
-
-
-# library(data.table)
-# library(janitor)
-# 
-# test_t <- transpose(test)
-# 
-# rownames(test_t) <- colnames(test)
-# colnames(test_t) <- rownames(test)
-# 
-# 
-# 
-# test_t %>% 
-#   as_tibble 
-# 
-# sapply(test_t, class)
-# 
-# 
-# as.numeric(test_t$"1")
-# 
-# glimpse(test_t)
-# 
-# row_to_names(test_t, 1, remove_rows_above = TRUE)
-# test_t %>% 
-#   mutate_if(is.character, as.factor)
 
 
 
@@ -370,28 +342,68 @@ Goods_most[1,2]
 # Belyse om det er sammenheng mellom demo i området og omsetning
 # Belyse om det er sammenheng mellom crime i området og omsetning
 
-# I choose 4 weeks from 20-23:
-sales_mnd <-All_df %>%
-  filter(Weather_Week >= 20, Weather_Week <= 23) %>%
-  #select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold,
-         #Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) #%>%
-  group_by(INV_NUMBER, Description, Price, Sold, Cost, Profit, Margin) %>% 
+# Cleaning the data set for unnecessary variable and :
+
+All_df_rev <- All_df %>% 
+  
+  # We merge small population groups into one variable:
+  mutate("All_Other_Groups"= rowSums(All_df[ , c("County_Non-Hispanic_Black","County_Non-Hispanic_Asian",
+                                                 "County_Non-Hispanic_Pacific_Islander", "County_Non-Hispanic_Two_or_more",
+                                                 "County_Hispanic_Black", "County_Hispanic_Asian",
+                                                 "County_Hispanic_Pacific_Islander", "County_Hispanic_Two_or_more")])) %>%  
+  
+  # and select the relevant variables:    
+  select(Store_Name, Store_Num, Store_City, County_Name, Weather_Station, Date, Weather_Week,    
+         Description, Price, Sold,Sales, Tot_Sls, Cost, Margin, Profit, Annual_Rent_Estimate,Store_Location, Store_Drive_Through, 
+         Store_Competition_Fastfood, Weather_Bad_Weather_days, County_Total_Crime_Rate, County_Violent_Rate, 
+         County_Property_Rate, County_Society_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White`,
+         `County_Non-Hispanic_Native_American`, County_Hispanic_White,  County_Hispanic_Native_American, All_Other_Groups, 
+         County_Total_Census_Pop, ) %>% 
+  
+  
+  # making percentages of population groups
+  mutate(All_Other_Groups_pct = round(100 * (All_Other_Groups/County_Total_Census_Pop),1),
+         `County_Non-Hispanic_White_pct` = round(100 * (`County_Non-Hispanic_White`/County_Total_Census_Pop),1),
+         `County_Non-Hispanic_Native_American_pct` = round(100 * (`County_Non-Hispanic_Native_American`/`County_Total_Census_Pop`),1),
+         `County_Hispanic_White_pct` = round(100 * (`County_Hispanic_White`/County_Total_Census_Pop),1),
+         `County_Hispanic_Native_American_pct` = round(100 * (`County_Hispanic_Native_American`/County_Total_Census_Pop),1)
+  ) %>% 
+  
+  # removing the variables we dont use
+  select(- c(`County_Non-Hispanic_White`,
+             `County_Non-Hispanic_Native_American`, County_Hispanic_White,  County_Hispanic_Native_American, All_Other_Groups, 
+             County_Total_Census_Pop)) %>% 
+  rename(Week_No = Weather_Week) 
+
+
+All_df_rev$County_Violent_Rate <-
+  round(All_df_rev$County_Violent_Rate,1)
+
+
+
+
+# I choose 4 weeks from 18-21:
+sales_mnd <-All_df_rev %>% 
+  filter(Week_No >= 18, Week_No <= 21) %>% 
+  select(Store_Name, Store_Num, Store_City, County_Name, Date,Description, Price, Sold, 
+         Sales, Tot_Sls, Cost, Margin, Profit) %>% 
+  group_by(Store_Num, Store_Name, Price, Description, Sold, Cost, Sales,Profit, Margin) %>% 
   summarise(Sales) %>% 
   ungroup()
-
 sales_mnd
 
+sum(sales_mnd$Sales) #funker ikke
+
+
+
+#FUNKER IKKE?
 # sum of variables:
 sum(sales_mnd$Sales)
 
+
 sum(sales_mnd$Profit)
 
-# Change from week 19 to week 20:
-# sales_change = round(100 * ((sum(sales_14_20$Sales)/sum(sales_14_19$Sales)-1)),1)
-# sales_change
-# 
-# profit_change = round(100 * ((sum(sales_14_20$Profit)/sum(sales_14_19$Profit)-1)),1)
-# profit_change
+
 
 
 max(sales_mnd$Sales)
@@ -420,12 +432,21 @@ sales_price_gr_mnd <-
 sales_price_gr_mnd
 
 
+
 # Total sales and profit:
+
 sum(sales_price_gr_mnd$Tot_sales)
+
+sum(sales_price_gr_mnd[ ,2])
+
+
 max(sales_price_gr_mnd$Tot_sales)  
+
 
 sum(sales_price_gr_mnd$Tot_profit)
 max(sales_price_gr_mnd$Tot_profit)
+
+
 
 sales_most_mnd <- 
   subset(sales_price_gr_mnd, Tot_sales == max(sales_price_gr_mnd$Tot_sales))
@@ -433,12 +454,15 @@ sales_most_mnd
 sales_most_mnd[1,1]
 sales_most_mnd[1,2]
 
+
+
 profit_most_mnd <- 
   subset(sales_price_gr_mnd, Tot_profit == max(sales_price_gr_mnd$Tot_profit))
 profit_most_mnd
 profit_most_mnd[1,1]
 profit_most_mnd[1,4]
 
+ 
 # share of sales and profit per pricegroup:
 sales_share_mnd <-
   sales_price_gr_mnd %>% 
@@ -451,7 +475,11 @@ Shares_most_mnd <-
   subset(sales_share_mnd, Share_sales_mnd == max(sales_share_mnd$Share_sales_mnd)) 
 Shares_most_mnd  
 
-#test <- subset(sales_share, Tot_share_sales == max(sales_share$Share_sales))
+
+# Setter inn tabell
+
+#Tabellkommentar:
+
 
 # profit_min <- 
 #   subset(sales_price_gr, Tot_profit == min(sales_price_gr$Tot_profit))
@@ -472,6 +500,10 @@ figure_3
 
 #Vi ser av figur 3 at den største omsetningen er av varer i prisgruppen `r sales_most_mnd[1,1]`. Totalomsetningen her er $`r sales_most_mnd[1,2]`. 
 # Den første prisgruppen er negativ. Årsaken til dette er at den også inneholder refusjoner mm. 
+
+# We see from Figure 3 that the largest sales is achieved from the price group `r sales_most_mnd [1,1]`.
+# The total Sales here is $ `r sales_most_mnd [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc.
+
 
 # Making a plot of shares of sales per pricegroup:  
 figure_3a <-
@@ -499,12 +531,50 @@ figure_4
 # Den totale fortjenesten her er $`r profit_most[1,4]`. Den første prisgruppen er negativ. Årsaken til dette er at den også inneholder refusjoner mm. som vil 
 # påvirke fortjenesten negativt.
 
+# We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most [1,1]`.
+# The total profit here is $ `r profit_most [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc. who will
+# negatively affect profits.
 
 
 
 
 
 
+
+
+# Development over mnds:
+# We now look at sales figures accross mnds
+
+
+test_mnd <-All_df_rev %>%
+  #filter(Weather_Week >= 20, Weather_Week <= 23) %>%
+  #select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold,
+  #Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) #%>%
+  group_by(Store_Name, Store_Num, Description, Price, Sold, Sales, Cost, Profit, Margin, Week_No, Date) %>% 
+  summarise(Date, Week_No, Sales) %>% 
+  ungroup()
+
+test_mnd
+
+
+week_test <-
+  test_mnd %>%
+  count(Store_Name, Store_Num, Week_No, Date) %>% 
+  rename(items = n)
+  
+
+week_test_2 <-
+  week_test %>% 
+  group_by(Store_Name, Week_No) %>% 
+  summarise(Store_Name)
+
+test_pivot <- 
+  pivot_wider(week_test_2, names_from = Store_Name, values_from = items)
+test_pivot
+ 
+  #summarise(Store_Name)
+
+  #group_by(Store_Name)
 
 
 
@@ -521,13 +591,6 @@ figure_4
 
 
 
-
-####
-# For further analysis  
-# I select the crime rates from this df  
-#   select(County_Name, County_Total_Crime_Rate, County_Violent_Rate, 
-#          County_Property_Rate, County_Society_Rate, County_Other_Rate) 
-# df2_crime_2
 
 
 
@@ -556,13 +619,6 @@ figure_4
 
 
 
-#
 
 
-####
-# For further analysis:
-# # Selecting the variables that seem to be interesting:
-# df6_weather_2 <- df6_weather %>% 
-#   select(Weather_Station, Weather_Date, Weather_Week, Weather_Bad_Weather_Week)
-# df6_weather_2
 
