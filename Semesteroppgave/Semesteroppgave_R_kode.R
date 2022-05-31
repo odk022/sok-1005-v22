@@ -116,7 +116,9 @@ df1_df5 <- left_join(df1_df4, df4_em, by = "County_Name")
 All_df <- left_join(df1_df5, df6_sales_3, by = c("Store_Num", "Weather_Date" = "Date"))
 
 All_df <- All_df %>% 
-  rename("Date" = "Weather_Date") 
+  rename("Date" = "Weather_Date") %>% 
+  filter(Cost > 0)
+  
  
 
  
@@ -157,6 +159,31 @@ sales_14_20 <-All_df %>%
   summarise(Sales) %>% 
   ungroup()
 
+
+sales_most_item <-
+  subset(sales_14_20, Sales = max(sales_14_20$Sales)) %>% 
+  arrange(desc(Sales))
+sales_most_item
+sales_most_item[1,2]
+sales_most_item[1,8]
+
+Profit_most_item <-
+subset(sales_14_20, Profit = max(sales_14_20$Profit)) %>% 
+  arrange(desc(Profit))
+Profit_most_item
+Profit_most_item[1,2]
+Profit_most_item[1,6]
+
+
+# sales_most_item <-
+#   subset(sales_14_20, Sold = max(sales_14_20$Sold)) %>% 
+#   arrange(desc(Sold))
+# sales_most_item
+
+
+
+
+
 # choose also week 19 to compare weeks:
 sales_14_19 <-All_df %>% 
   filter(Weather_Week == 19, Store_Num == 14) %>% 
@@ -174,9 +201,6 @@ sum(sales_14_20$Sales)
 sum(sales_14_19$Profit)
 sum(sales_14_20$Profit)
 
-# Change from week 19 to week 20:
-sales_change = round(100 * ((sum(sales_14_20$Sales)/sum(sales_14_19$Sales)-1)),1)
-sales_change
 
 profit_change = round(100 * ((sum(sales_14_20$Profit)/sum(sales_14_19$Profit)-1)),1)
 profit_change
@@ -188,14 +212,14 @@ max(sales_14_20$Sales)
 # Sorting the goods after price groups:
 
 sales_price_gr <- sales_14_20 %>% 
-  group_by(price_group = ifelse(Price <= 1.0, "price_$1", 
-                         ifelse(Price > 1 & Price <= 2, "price_$2", 
-                         ifelse(Price > 2 & Price <= 3, "price_$3", 
-                         ifelse(Price > 3 & Price <= 4, "price_$4", 
-                         ifelse(Price > 4 & Price <= 5, "price_$5", 
-                         ifelse(Price > 5 & Price <= 6, "price_$6", 
-                         ifelse(Price > 6 & Price <= 7, "price_$7", 
-                         ifelse(Price > 7 & Price <= 8.0, "price_$8", "price_over_$8"))))))))) %>% 
+  group_by(price_group = ifelse(Price <= 1.0, "price_below_$1", 
+                         ifelse(Price > 1 & Price <= 2, "price_$1", 
+                         ifelse(Price > 2 & Price <= 3, "price_$2", 
+                         ifelse(Price > 3 & Price <= 4, "price_$3", 
+                         ifelse(Price > 4 & Price <= 5, "price_$4", 
+                         ifelse(Price > 5 & Price <= 6, "price_$5", 
+                         ifelse(Price > 6 & Price <= 7, "price_$6", 
+                         ifelse(Price > 7 & Price <= 8.0, "price_$7", "price_over_$8"))))))))) %>% 
   summarise(Sold, Price, Sales, Profit)
 
 
@@ -310,10 +334,25 @@ figure_2
 
 # Hvilke varer i gruppen (lenke til størst gruppe)
 
+# Highest number of items sold
 Goods_most<- sales_14_20 %>% 
   select(Description, Price, Sold, Profit, Sales) %>% 
-  filter(Price > 4 & Price <= 5, Sold > 10) %>% 
-  arrange(desc(Sales))
+  filter(Sold > 10) %>% 
+  arrange(desc(Sold))
+Goods_most
+
+# Higest revenue from Sales
+Goods_most<- sales_14_20 %>% 
+  select(Description, Price, Sold, Profit, Sales) %>% 
+  filter(Sold > 10) %>% 
+  arrange(desc(Sold))
+Goods_most
+
+cost_0 <- sales_14_20 %>% 
+  filter(Cost== 0)
+cost_0
+
+
 
 # Her er salget filtrert etter prisgruppe og salg over 10 enheter.
 # Vi får da følgende tabell:
@@ -321,12 +360,9 @@ Goods_most[1,2]
 
 
 
+ # OPPGAVE 3:
+# Gjenta analysen for aggregert nivå
 
-
-
-
-
-  # OPPGAVE 3:
 # Dataene skal benyttes til en månedlig salgsrapport på aggregert nivå til konsernledelsen. 
 # Gi noen eksempler på hva innholdet i en slik langsiktig konsernrapport bør inneholde. 
 # Begrunn dine valg og tankegangen bak figurer og eventuelle tabeller.
@@ -382,31 +418,26 @@ All_df_rev$County_Violent_Rate <-
 
 
 
-# I choose 4 weeks from 18-21:
+# I choose 4 weeks from 40 to 44:
+
 sales_mnd <-All_df_rev %>% 
-  filter(Week_No >= 18, Week_No <= 21) %>% 
+  filter(Week_No >= 40, Week_No <= 44) %>% 
   select(Store_Name, Store_Num, Store_City, County_Name, Date,Description, Price, Sold, 
-         Sales, Tot_Sls, Cost, Margin, Profit) %>% 
-  group_by(Store_Num, Store_Name, Price, Description, Sold, Cost, Sales,Profit, Margin) %>% 
-  summarise(Sales) %>% 
+         Sales, Profit) %>% 
+  group_by(Description, Price, Sold, Sales,Profit) %>% 
+  summarise(Sales, Sold) %>% 
   ungroup()
 sales_mnd
 
-sum(sales_mnd$Sales) #funker ikke
-
-
-
-#FUNKER IKKE?
 # sum of variables:
 sum(sales_mnd$Sales)
-
 
 sum(sales_mnd$Profit)
 
 
+# De totale salgsinntektene for alle utsalgene i denne måneden var $ `r sum(sales_mnd$Sales)`.
+# Samlet fortjeneste i perioden var $ `r sum(sales_mnd$Profit)`.
 
-
-max(sales_mnd$Sales)
 
 # Sorting the goods after price groups:
 
@@ -419,66 +450,87 @@ sales_price_gr_mnd <- sales_mnd %>%
                          ifelse(Price > 5 & Price <= 6, "price_$6", 
                          ifelse(Price > 6 & Price <= 7, "price_$7", 
                          ifelse(Price > 7 & Price <= 8.0, "price_$8", "price_over_$8"))))))))) %>% 
-  summarise(Sold, Price, Sales, Profit)
-
+  summarise(Description, Sold, Price, Sales, Profit)
+sales_price_gr_mnd
 
 
 sales_price_gr_mnd <-
   sales_price_gr_mnd %>%
-  select(price_group, Sold, Price, Sales, Profit) %>%
+  select(Description, price_group, Sold, Price, Sales, Profit) %>%
   filter(price_group >= 0) %>%
-  group_by(price_group) %>%
+  group_by(Description, price_group) %>%
   summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
 sales_price_gr_mnd
 
 
-
 # Total sales and profit:
-
-sum(sales_price_gr_mnd$Tot_sales)
-
-sum(sales_price_gr_mnd[ ,2])
 
 
 max(sales_price_gr_mnd$Tot_sales)  
-
-
-sum(sales_price_gr_mnd$Tot_profit)
 max(sales_price_gr_mnd$Tot_profit)
 
+#Hvorfor blir lenkene i markdown så rare?  
+  
 
 
+# Amount and Share of sales and profit per pricegroup:
+  
+#Amount of Sales and Profit
+# Amount of Sales
 sales_most_mnd <- 
   subset(sales_price_gr_mnd, Tot_sales == max(sales_price_gr_mnd$Tot_sales))
 sales_most_mnd
 sales_most_mnd[1,1]
 sales_most_mnd[1,2]
 
+#Sjekkes
+# sales_min_mnd <- sales_price_gr_mnd %>% 
+#   select(-price_group$price_$1) %>% 
+#   subset(sales_price_gr_mnd, Tot_sales == min(sales_price_gr_mnd$Tot_sales))
+# sales_min_mnd
+# sales_min_mnd[1,1]
+# sales_min_mnd[1,2]
 
 
+# Amount of Profit
 profit_most_mnd <- 
   subset(sales_price_gr_mnd, Tot_profit == max(sales_price_gr_mnd$Tot_profit))
 profit_most_mnd
 profit_most_mnd[1,1]
 profit_most_mnd[1,4]
 
- 
-# share of sales and profit per pricegroup:
-sales_share_mnd <-
+
+
+# r amount and shares of Sales and Profit
+amount_share_mnd <-
   sales_price_gr_mnd %>% 
   mutate(Share_sales_mnd = round(100 *(sales_price_gr_mnd$Tot_sales/sum(sales_price_gr_mnd$Tot_sales)), 1),
          Share_profit_mnd = round(100 *(sales_price_gr_mnd$Tot_profit/sum(sales_price_gr_mnd$Tot_profit)),1)) %>% 
   select(price_group, Tot_sold, Tot_sales, Share_sales_mnd, Tot_profit, Share_profit_mnd)
-sales_share_mnd
+amount_share_mnd
+
+sales_most_mnd <- 
+  subset(amount_share_mnd, Tot_sales == max(amount_share_mnd$Tot_sales))
+sales_most_mnd
+sales_most_mnd[1,1]
+sales_most_mnd[1,2]
 
 Shares_most_mnd <- 
-  subset(sales_share_mnd, Share_sales_mnd == max(sales_share_mnd$Share_sales_mnd)) 
+  subset(amount_share_mnd, Share_sales_mnd == max(amount_share_mnd$Share_sales_mnd)) 
 Shares_most_mnd  
 
+#We make a table of amount and shares
 
-# Setter inn tabell
+amount_shares_mnd <- amount_share_mnd[1:9, ]
+kable(amount_shares_mnd, caption = "Table 3: Amount and shares for Sale and Profit")
 
-#Tabellkommentar:
+
+
+#Table comment:  
+  
+# We see from Table 3 that the highest sales revenue comes from the price group `r sales_most_mnd [1,1]`. 
+#In this price group, goods were sold for a total of $ `r sales_most_mnd [1,3]`. The profit from sales in 
+#this price group was `r sales_most_mnd [1,5]`.
 
 
 # profit_min <- 
@@ -498,8 +550,6 @@ figure_3 <-
   theme_classic()
 figure_3
 
-#Vi ser av figur 3 at den største omsetningen er av varer i prisgruppen `r sales_most_mnd[1,1]`. Totalomsetningen her er $`r sales_most_mnd[1,2]`. 
-# Den første prisgruppen er negativ. Årsaken til dette er at den også inneholder refusjoner mm. 
 
 # We see from Figure 3 that the largest sales is achieved from the price group `r sales_most_mnd [1,1]`.
 # The total Sales here is $ `r sales_most_mnd [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc.
@@ -527,46 +577,80 @@ figure_4 <-
   theme_classic()
 figure_4
 
-# Vi ser av figur 4 at den største fortjenesten oppnås av omsetningen i prisgruppen `r profit_most[1,1]`. 
-# Den totale fortjenesten her er $`r profit_most[1,4]`. Den første prisgruppen er negativ. Årsaken til dette er at den også inneholder refusjoner mm. som vil 
-# påvirke fortjenesten negativt.
 
 # We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most [1,1]`.
 # The total profit here is $ `r profit_most [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc. who will
 # negatively affect profits.
 
+# which goods are selling most - funker ikke
+# hvordan få summert de ulike varekategoriene?
+Goods_most_mnd<- sales_mnd %>%
+  filter(Price > 4 & Price <= 5) %>% 
+  arrange(desc(Sales))
 
+sum(Goods_most_mnd$Sold)
+sum(Goods_most_mnd$Sales)
+sum(Goods_most_mnd$Profit)
 
+#We make a table of most sold goods
 
+Goods_most <- Goods_most[1:10, ]
+kable(Goods_most, caption = "Table 2: Most sold goods")
 
 
 
 
 # Development over mnds:
-# We now look at sales figures accross mnds
+
+# #months <- All_df_rev %>% 
+#   group_by(month = ifelse(Week_No >= 14 & Week_No <= 17, "Apr_2012", 
+#                    ifelse(Week_No >= 18 & Week_No <= 22, "May_2012", 
+#                    ifelse(Week_No >= 23 & Week_No  <= 26, "Jun_2012", 
+#                    ifelse(Week_No  >= 27 & Week_No <= 30, "July_2012", 
+#                    ifelse(Week_No  >= 31 & Week_No  <= 35, "Aug_2012", 
+#                    ifelse(Week_No  >= 36 & Week_No <= 39, "Sep_2012", 
+#                    ifelse(Week_No  >= 40 & Week_No  <= 44," Oct_2012",
+#                    ifelse(Week_No >= 45 & Week_No  <= 48, "Nov_2012", 
+#                    ifelse(Week_No  >= 49 & Week_No <= 52, "Des_2012", 
+#                    ifelse(Week_No  >= 1 & Week_No  <= 5, "Jan_2013", 
+#                    ifelse(Week_No  >= 6 & Week_No <= 9, "Feb_2013", 
+#                    ifelse(Week_No  >= 10 & Week_No  <= 12," Mar_2013", "no"    
+#                           ))))))))))))) %>% 
+#   summarise(Sold, Price, Sales, Profit)
+# month
+# 
+# 
+# test_month <-
+#   months %>%
+#   select(month, Sold, Price, Sales, Profit) %>%
+#   #filter(price_group >= 0) %>%
+#   group_by(month) %>%
+#   summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
+# test_month
+# test_month[4,]
+
+
+
+
+
+# Hva vil du her
+# En kolonne for hver butikk
+#rader:Sales pr uke,Profit pr uke mer?
 
 
 test_mnd <-All_df_rev %>%
-  #filter(Weather_Week >= 20, Weather_Week <= 23) %>%
-  #select(Store_Name, Store_Num, Store_City, County_Name, Date, INV_NUMBER,Description, Price, Sold,
-  #Sales, Tot_Sls, Unit_Cost, Cost,Cost_Percent, Margin, Profit) #%>%
-  group_by(Store_Name, Store_Num, Description, Price, Sold, Sales, Cost, Profit, Margin, Week_No, Date) %>% 
-  summarise(Date, Week_No, Sales) %>% 
+  filter(Week_No >= 40, Week_No <= 44) %>%
+  select(Store_Name, Store_Num, Store_City, County_Name, Date, Description, Price, Sold,
+  Sales, Profit) %>%
+  group_by(Store_Name, Store_Num, Store_City, County_Name, Date, Description, Price, Sold,
+           Sales, Profit) %>% 
   ungroup()
 
 test_mnd
+sum(test_mnd$Sales)
+sum(test_mnd$Profit)
+sum(test_mnd$Sold)
 
-
-week_test <-
-  test_mnd %>%
-  count(Store_Name, Store_Num, Week_No, Date) %>% 
-  rename(items = n)
-  
-
-week_test_2 <-
-  week_test %>% 
-  group_by(Store_Name, Week_No) %>% 
-  summarise(Store_Name)
 
 test_pivot <- 
   pivot_wider(week_test_2, names_from = Store_Name, values_from = items)
@@ -575,8 +659,6 @@ test_pivot
   #summarise(Store_Name)
 
   #group_by(Store_Name)
-
-
 
 
 # OPPGAVE 4:
@@ -596,26 +678,6 @@ test_pivot
 
 
 
-####
-# For further analysis
-# I use the four largest groups and sum the small groups in to one category "All_Other_Groups". 
-
-# df3_demo_2 <- df3_demo %>% 
-#   mutate("All_Other_Groups"= rowSums(df3_demo[ , c("County_Non-Hispanic_Black","County_Non-Hispanic_Asian",
-#                               "County_Non-Hispanic_Pacific_Islander", "County_Non-Hispanic_Two_or_more",
-#                               "County_Hispanic_Black", "County_Hispanic_Asian", 
-#                               "County_Hispanic_Pacific_Islander", "County_Hispanic_Two_or_more")])) %>% 
-#   select("County_Name", "County_Total_Census_Pop", "County_Non-Hispanic_White", "County_Non-Hispanic_Native_American", 
-#         "County_Hispanic_White", "County_Hispanic_Native_American","All_Other_Groups") 
-# 
-# 
-# test <- df3_demo_2 %>% 
-#     mutate(All_Other_Groups_pct = round(100 * (All_Other_Groups/County_Total_Census_Pop),1),
-#            County_Non-Hispanic_White_pct = round(100 * (County_Non-Hispanic_White/County_Total_Census_Pop),1),
-#            County_Non-Hispanic_Native_American_pct = round(100 * (County_Non-Hispanic_Native_American/County_Total_Census_Pop),1),
-#            County_Hispanic_White_pct = round(100 * (County_Hispanic_White/County_Total_Census_Pop),1),
-#            County_Hispanic_Native_American_pct = round(100 * (County_Hispanic_Native_American/County_Total_Census_Pop),1),
-#            )
 
 
 
