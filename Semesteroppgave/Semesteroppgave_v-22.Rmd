@@ -71,10 +71,10 @@ rm(list=ls())
 - county_demographic = df3_demo\
 - county_employment = df4_em\
 - weekly_weather = df5_weather\
-- weekly_sales_10stores = df6_sales
+- weekly_sales_10stores = df6_sales  
 
+<br/>
 **I go through the dfs and make necessary changes in names and formats:**
-
 
 ```{r renaming and going through the dfs}
 # some changes
@@ -138,9 +138,10 @@ All_df <- All_df %>%
   rename("Date" = "Weather_Date") %>% 
   filter(Cost > 0) 
 All_df
-
 ```
+<pre>
 
+</pre>
 ### **Oppgave 2: Lag en ukesrapport for et utsalg**
 
 ```{r links_to_name_and_period}
@@ -209,16 +210,12 @@ profit_change
 ```
 
 **Comment**  
-  
 Total revenues of Sales for store `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]`  i week `r Week[1,22]` were \$ `r sum(sales_14_20$Sales)`. The total sales changed `r sales_change` percent compared to the week before.  
 Total profit in the same period were \$ `r sum(sales_14_20$Profit)`. The change in total profit from the week before were  `r profit_change` percent.   
 Sales revenues were greatest for `r sales_most_item[1,2]`. Total sales for this were \$ `r sales_most_item[1,8]`.
 The most profitable item were `r Profit_most_item[1,2]`. For this, the total profit were \$ `r Profit_most_item[1,6]`.  
 
-  
-  
-  
-
+<br/>  
 
 #### **Sorting the goods after price groups:**
 
@@ -277,13 +274,12 @@ Shares_most <-
 
 ```{r table 1 Amount and shares for Sale and Profit}
 Goods_shares <- sales_share[1:9, ]
-  knitr::kable(Goods_shares, 
-               caption = "Table 1: Amount and shares for Sale and Profit")
+  kable(Goods_shares, caption = "Table 1: Amount and shares for Sale and Profit")
 ```
 **Comment**  
-We see from table 1 the highest revenue comes from sale in the pricegroup `r Shares_most[1,1]`. The sales here are \$ `r Shares_most[1,3]` and profit are \$ `r Shares_most[1,5]`. This pricegoup has a share of `r Shares_most[1,4]` percent of total Sale and `r Shares_most[1,6]` percent of total Profit.
+We see from table 1 the highest revenue comes from sale in the pricegroup `r Shares_most[1,1]`. The sales here are \$ `r Shares_most[1,3]` and profit are \$ `r Shares_most[1,5]`. This pricegoup has a share of `r Shares_most[1,4]` percent of total Sale and `r Shares_most[1,6]` percent of total Profit.  
 
-
+<br/>
 
 #### **Making a plot of sales per pricegroup:**
 
@@ -301,9 +297,8 @@ figure_1
 ```
 
 **Comment**  
-
 We see from Figure 1 that the highest sales are of goods in the price group `r sales_most[1,1]`. Total Sales are \$`r sales_most[1,2]`. The first price group has negative sales figures. The reason for this is that it also contains refunds etc.  
-
+<br/>
 
 #### **Making a plot of shares of sales per pricegroup:**
 
@@ -321,7 +316,7 @@ figure_1a
 
 **Comment**  
 We see from Figure 1a that the highest share of sales are of goods in the price group `r Shares_most[1,1]`. This price group has `r Shares_most[1,4]` per cent of all sales.  
-
+<br/>
 
 #### **Making a plot of profit per pricegroup:**
 
@@ -339,12 +334,7 @@ figure_2
 
 **Comment**  
 We see from Figure 2 that the largest profit is achieved from sales in the price group `r profit_most [1,1]`. The total profit here is \$ `r profit_most [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc. who will negatively affect profits.  
-  
-  
-
-
-
-
+<br/>
 
 #### **The best-selling items**
 
@@ -385,12 +375,12 @@ It appears from Table 2 that the mostselling item were `r Goods_most [1,2]`.  `r
 
 In second place we find `r Goods_most[2,2]` with `r Goods_most[2,4]` units and $ `r Goods_most[2,8]` of sale. As third ranked, we find `r Goods_most[3,2]` with `r Goods_most[3,4]` units and $ `r Goods_most[3,8]` of sale.
 
-**Most profitable items**  
-
+ 
 `r Goods_most_p[1,2]` is the most profitable sold item. The profit is \$ `r Goods_most[1,6]`. This amounts to
-`r round(100 *(Goods_most_p[1,6]/sum(sales_14_20$Profit)),1)` percent of total profit.
+`r round(100 *(Goods_most_p[1,6]/sum(sales_14_20$Profit)),1)` percent of total profit.  
+<br/>
 
-**The lowest sales**
+#### **The lowest sales**
 
 ```{r low sales}
 # lowest number of items sold
@@ -418,35 +408,21 @@ Goods_low <- Goods_low[1:10, ]
 ```
 **Comment**  
 From table 3 we see that there are many items that not are selling good.  
-  
+<br/>
   
 
-##### **Summary:**  
+#### **Summary:**  
 The week sales report for Store `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` in week `r Week[1,22]`show that total revenues for 
 were \$ `r sum(sales_14_20$Sales)`, and total Profit were \$ `r sum(sales_14_20$Profit)`.  
 The most-selling item were `r sales_most_item[1,2]`. Total sales for this were \$ `r sales_most_item[1,8]`. The total sales changed `r sales_change` percent compared to the week before.  
 The most profitable item were `r Profit_most_item[1,2]`.
 For this, the total profit were \$ `r Profit_most_item[1,6]`. The change in total profit from the week before were \ `r profit_change` percent.  
 
+<pre>
 
-
-
+</pre>
 ### **Oppgave 3: Lag en månedlig salgrapport på aggregert nivå.**
 
-Månedsdata - lage data for alle mnd slik at man kan se utvikling, totalt
-og hvert utsalg. Grafikk
-
-Omsetning totalt utvikling(Sales) Grafikk
-
-Deler inn i prisgrupper
-
-Hvilke prisgrupper gir mest/minst profitt
-
-Omsetning pr prisgruppe Grafikk
-
-Andel av omsetning
-
-Hvor mye utgjør hver prisgruppe av salget. Grafikk
 
 Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå
 sammen
@@ -462,9 +438,8 @@ It has been chosen here to divide the product range into price groups and look a
 
 It has also been chosen to look at items with the lowest sales, which can be helpful in assessing whether to maintain the large breadth of the product range.  
 
-The dataset is not very suitable for creating real monthly data because it is based on weeks. It will be the case that a week can contain data for several months. It is therefore recommended that the group switch to a day-based accounting system so that monthly data can be created in a simpler way.
-
-
+The dataset is not very suitable for creating real monthly data because it is based on weeks. It will be the case that a week can contain data for several months. It is therefore recommended that the group switch to a day-based accounting system so that monthly data can be created in a simpler way.  
+<br/>
 
 **Cleaning the data set for unnecessary variable and grouping some
 variables:**
@@ -524,10 +499,10 @@ sum(sales_mnd$Sales)
 sum(sales_mnd$Profit)
 ```
 **Comment**  
-The total Sales revenue from all the Stores in this month were $`r (sum(sales_mnd$Sales))/1000`. Total Profit amounts to $`r (sum(sales_mnd$Profit))/1000`. All numbers are in thousands of $.
+The total Sales revenue from all the Stores in this month were $`r (sum(sales_mnd$Sales))/1000`. Total Profit amounts to $`r (sum(sales_mnd$Profit))/1000`. All numbers are in thousands of $.  
+<br/>
 
-
-**Sorting the goods after price groups:**  
+#### **Sorting the goods after price groups:**  
 Due to the large breadth of the product range, it has been chosen to take the product prices as a starting point for the analysis and group them. They are sorted in following groups. Price below \$1(here are also refund etc that is negative figures), between \$1 and \$2, and so on. The last price group is price over \$8.
 
 ```{r sorting pricegroups for use on aggregate level}
@@ -544,88 +519,143 @@ sales_price_gr_mnd <- sales_mnd %>%
 sales_price_gr_mnd
 ```
 
-grouping after pricegroups:
+grouping after pricegroups and items:
 
-```{r grouping by pricegroups}
-sales_price_gr_mnd <-
+```{r grouping by pricegroups and items}
+# sum pricegroups
+price_gr_Sales_mnd <-
+  sales_price_gr_mnd %>%
+  select(Description, price_group, Sold, Price, Sales, Profit) %>%
+  filter(price_group >= 0) %>%
+  group_by(price_group) %>%
+  summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
+price_gr_Sales_mnd
+
+# sum items
+sales_Description_mnd <-
   sales_price_gr_mnd %>%
   select(Description, price_group, Sold, Price, Sales, Profit) %>%
   filter(price_group >= 0) %>%
   group_by(Description, price_group) %>%
   summarise(Tot_sales = sum(Sales), Tot_sold = sum(Sold), Tot_profit = sum(Profit)) 
-sales_price_gr_mnd
+sales_Description_mnd
 ```
 
 ```{r}
 # Total sales and profit:
-sum(sales_price_gr_mnd$Tot_sales)
+round(sum(price_gr_Sales_mnd$Tot_sales),0)
+round(max(price_gr_Sales_mnd$Tot_sales),0) 
 
-
-max(sales_price_gr_mnd$Tot_sales) 
-
-sum(sales_price_gr_mnd$Tot_profit)
-max(sales_price_gr_mnd$Tot_profit)
-```
-
-
-
-**Amount and Share of sales and profit per pricegroup:**
-
-```{r Amount of Sales and Profit}
-# Amount of Sales
-sales_most_mnd <- 
-  subset(sales_price_gr_mnd, Tot_sales == max(sales_price_gr_mnd$Tot_sales))
-sales_most_mnd
-
-# Amount of Profit
-profit_most_mnd <- 
-  subset(sales_price_gr_mnd, Tot_profit == max(sales_price_gr_mnd$Tot_profit))
-profit_most_mnd
+round(sum(price_gr_Sales_mnd$Tot_profit),0)
+round(max(price_gr_Sales_mnd$Tot_profit),0) 
 
 ```
-**Comment**  
-The highest revenue from Sales this month was from `r sales_most_mnd[1,1]`. This amounted to $`r (sales_most_mnd[1,3])/1000` in revenue. The largest profit was from `r profit_most_mnd[1,1]`. Here, the sum was $ `r (profit_most_mnd[1,5])/1000`. All numbers are in thousands of $.
 
+#### **Amount and Share of Sales and Profit per price group:**
 
 ```{r amount and shares of Sales and Profit}
-amount_share_mnd <-
-  sales_price_gr_mnd %>% 
-  mutate(Share_sales_mnd = round(100 *(Tot_sales/sum(sales_price_gr_mnd$Tot_sales)), 1),
-         Share_profit_mnd = round(100 *(Tot_profit/sum(sales_price_gr_mnd$Tot_profit)),1)) %>% 
+# amount and shares of Sales and Profit per price group
+amount_share_pricegroup_mnd <-
+  price_gr_Sales_mnd %>% 
+  mutate(Share_sales_mnd = round(100 *(Tot_sales/sum(price_gr_Sales_mnd$Tot_sales)), 1),
+         Share_profit_mnd = round(100 *(Tot_profit/sum(price_gr_Sales_mnd$Tot_profit)),1)) %>% 
+  select(price_group, Tot_sold, Tot_sales, Share_sales_mnd, Tot_profit, Share_profit_mnd) %>% 
+  arrange(desc(Tot_sales))
+amount_share_pricegroup_mnd
+
+# Amount of Sales
+sales_most_pricegroup_mnd <- 
+  subset(amount_share_pricegroup_mnd, Tot_sales == max(amount_share_pricegroup_mnd$Tot_sales))
+sales_most_pricegroup_mnd
+
+# Share of total Sales
+Shares_most_pricegroup_mnd <- 
+  subset(amount_share_pricegroup_mnd, Share_sales_mnd == max(amount_share_pricegroup_mnd$Share_sales_mnd)) 
+Shares_most_pricegroup_mnd
+
+# Amount of Profit
+profit_most_pricegroup_mnd <- 
+  subset(amount_share_pricegroup_mnd, Tot_profit == max(amount_share_pricegroup_mnd$Tot_profit))
+profit_most_pricegroup_mnd
+
+# Share of total Profit
+profit_share_most_pricegroup_mnd <-
+  subset(amount_share_pricegroup_mnd, Share_profit_mnd == max(amount_share_pricegroup_mnd$Share_profit_mnd))  
+profit_share_most_pricegroup_mnd
+
+# We make a table of amount and shares
+amount_shares_pricegroup_mnd <- amount_share_pricegroup_mnd[1:9, ]
+kable(amount_shares_pricegroup_mnd, caption = "Table 4: Amount and shares for Sale and Profit per price group")
+```
+**Comment**  
+We see from Table 4 that the highest sales revenue comes from the price group `r amount_shares_pricegroup_mnd [1,1]`. The revenues were $ `r (sales_most_pricegroup_mnd [1,3])/1000`. The profit from sales in this price group was `r (profit_most_pricegroup_mnd [1,5])/1000`. All numbers are in thousands of $.  
+
+<br/>  
+
+#### **Amount and Share of Sales and Profit per item:**  
+
+```{r Amount and Share of Sales and Profit per item}
+amount_share_item_mnd <-
+  sales_Description_mnd %>% 
+  mutate(Share_sales_mnd = round(100 *(Tot_sales/sum(sales_Description_mnd$Tot_sales)), 1),
+         Share_profit_mnd = round(100 *(Tot_profit/sum(sales_Description_mnd$Tot_profit)),1)) %>% 
   select(Description, price_group, Tot_sold, Tot_sales, Share_sales_mnd, Tot_profit, Share_profit_mnd) %>% 
   arrange(desc(Tot_sales))
-amount_share_mnd
-
-sales_most_mnd <- 
-  subset(amount_share_mnd, Tot_sales == max(amount_share_mnd$Tot_sales))
-sales_most_mnd
-
-Shares_most_mnd <- 
-  subset(amount_share_mnd, Share_sales_mnd == max(amount_share_mnd$Share_sales_mnd)) 
-Shares_most_mnd  
+amount_share_item_mnd
 ```
+SKAL DETTE MED?
+```{r bestseeling in pricegroup $5}
+# bestselling items in pricegroup 5
+bestselling_pgr_5 <-
+  amount_share_item_mnd %>% 
+  filter(price_group == "price_$5") %>% 
+  arrange(desc(Tot_sold))
 
-We make a table of amount and shares
-
-```{r table 4 amount and shares}
-amount_shares_mnd <- amount_share_mnd[1:10, ]
- kable(amount_shares_mnd, caption = "Table 4: Amount and shares for Sale and Profit")
-
+# We make a table of the 10 bestselling items in pricegroup $5
+bestselling_pgr_5 <- bestselling_pgr_5[1:10, ]
+kable(bestselling_pgr_5, caption = "Table 5: Most sold items in price group $5 ")
 ```
 
 **Comment**  
-We see from Table 4 that the highest sales revenue comes from the `r amount_shares_mnd [1,1]`.   
+From table 5 we see that the item that sells the most is `r bestselling_pgr_5[1,1]` It was sold `r bestselling_pgr_5[1,3]` units of it in this month.
 
-In this price group, goods were sold for a total of \$ `r (sales_most_mnd [1,4])/1000`. The profit from sales of this item  was `r (sales_most_mnd [1,6])/1000`. All numbers are in thousands of $.
+```{r Amount and Share of Sales and Profit per item 2}
+# Amount of Sales
+sales_most_item_mnd <- 
+  subset(amount_share_item_mnd, Tot_sales == max(amount_share_item_mnd$Tot_sales))
+sales_most_item_mnd
 
+# Share of total Sales
+Shares_most_item_mnd <- 
+  subset(amount_share_item_mnd, Share_sales_mnd == max(amount_share_item_mnd$Share_sales_mnd)) 
+Shares_most_item_mnd 
 
+# Amount of Profit
+profit_most_item_mnd <- 
+  subset(amount_share_item_mnd, Tot_profit == max(amount_share_item_mnd$Tot_profit))
+profit_most_item_mnd
 
-**Making a plots of sales of mostselling items:**
+# Share of total Profit
+profit_share_most_item_mnd <-
+  subset(amount_share_item_mnd, Share_profit_mnd == max(amount_share_item_mnd$Share_profit_mnd))  
+profit_share_most_item_mnd
+
+#We make a table of amount and shares
+amount_shares_item_mnd <- amount_share_item_mnd[1:10, ]
+kable(amount_shares_item_mnd, caption = "Table 6: Amount and shares for Sale and Profit per item")
+```
+
+**Comment**  
+
+We see from Table 6 that the highest sales revenue comes from the item `r amount_shares_item_mnd [1,1]`. The Sales revenue were $ `r (Shares_most_item_mnd [1,4])/1000`. The profit from sales of this item  was `r (profit_share_most_item_mnd  [1,6])/1000`. All numbers are in thousands of $.  
+<br/>
+
+#### **Making a plots of Sales of mostselling items:**
 
 ```{r plot figure 3 sales revenue per mostselling items}
 # Sales pr item
 figure_3 <-
-  amount_shares_mnd %>% 
+  amount_shares_item_mnd %>% 
   ggplot(aes(x= Description, y = Tot_sales))+
   geom_bar(stat= "identity", fill = "steelblue") +
   geom_text(aes(label=Tot_sales/1000), vjust= -0.3, size=3.5)+
@@ -638,12 +668,15 @@ figure_3
 ```
 
 **Comment**  
-We see from Figure 3 that the largest Sales revenue is achieved by `r sales_most_mnd [1,1]`. The sales revenue from this item amounts to $`r (Shares_most_mnd[1,4])/1000`. Numbers are in thousands of $.   
+We see from Figure 3 that the largest Sales revenue is achieved by `r sales_most_item_mnd [1,1]`. The sales revenue from this item amounts to $`r (sales_most_item_mnd[1,4])/1000`. Numbers are in thousands of $.     
+<br/>
 
-```{r plot figure 3 mostselling items}
-# Sales as shares of total
+#### **Making a plot of Sales of mostselling items as shares of total Sales:**
+
+```{r plot figure 3a mostselling items shares}
+# Sales as shares of total Sales
 figure_3a <-
-  amount_shares_mnd %>% 
+  amount_shares_item_mnd %>% 
   ggplot(aes(x= Description, y = Share_sales_mnd))+
   geom_bar(stat= "identity", fill = "steelblue") +
   geom_text(aes(label=Share_sales_mnd), vjust= -0.3, size=3.5)+
@@ -656,58 +689,28 @@ figure_3a
 ```
 
 **Comment**   
-We see from Figure 3a that the largest share of total Sales is achieved by `r sales_most_mnd [1,1]`. This item has `r Shares_most_mnd [1,5]` percent of total Sales.
-
+We see from Figure 3a that the largest share of total Sales is achieved by `r Shares_most_item_mnd [1,1]`. This item has `r Shares_most_item_mnd [1,5]` percent of total Sales.  
+<br/>
 
   
-**Making a plot of shares of sales per pricegroup:**
+#### **Making a plot of profit on mostselling items:**
 
-
-
-**Comment**  
-We see from figure 3a that the largest share of sales in this month are in the price group `r Shares_most_mnd[1,1]`. This price group have `r Shares_most_mnd [1,4]` percent of all Sales.  
-
-
-
-**Making a plot of profit per pricegroup:**
-
-```{r plot profit per pricegroup}
+```{r plot figure 4profit per item}
+# Profit as share of total Profit
 figure_4 <-
-  amount_shares_mnd %>% 
+  amount_shares_item_mnd %>% 
   ggplot(aes(x= Description, y = Share_profit_mnd))+
   geom_bar(stat= "identity", fill = "steelblue") +
   geom_text(aes(label= Share_profit_mnd), vjust= -0.3, size=3.5)+
   labs(title = "Figure 4: Profits of mostselling items as shares of total Profit in one month", 
        x = "Item Description", y = "Profit shares per item",
-       caption = "Figure 3 shows the 10 mostselling item as shares of total Profit .") +
+       caption = "Figure 4 shows the 10 mostselling item as shares of total Profit .") +
   theme_classic() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 figure_4
 ```
 
-**Comment**
+**Comment**  
+We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most_item_mnd[1,1]`. This item has `r profit_most_item_mnd[1,7]` percent of total Profit.
 
-We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most_mnd[1,1]`. The total profit here is \$ `r (profit_most_mnd[1,4])/1000`. The first price group is negative. The reason for this is that it also contains refunds etc. who will negatively affect profits. All numbers are in thousands of $.
 
-#### **The best-selling items in**
-
-Hvilke varer finner vi i prisgruppen med størst omsetning. Vi finner
-(lenke til varer) i denne gruppen.
-
-```{r most selling good mnd}
-Goods_most_mnd<- sales_mnd %>%
-  filter(Price > 4 & Price <= 5, Sold > 10) %>% 
-  arrange(desc(Sales))
-
-sum(Goods_most_mnd$Sold)
-sum(Goods_most_mnd$Sales)
-sum(Goods_most_mnd$Profit)
-```
-
-We make a table of most sold goods NB må ordnes med sumtall for hvert
-vareslag
-
-```{r table 4 most sold goods mnd}
-Goods_most_mnd <- Goods_most_mnd[1:10, ]
-  kable(Goods_most_mnd, caption = "Table 4: Most sold goods in month")
-```
