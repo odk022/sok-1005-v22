@@ -421,15 +421,8 @@ For this, the total profit were \$ `r Profit_most_item[1,6]`. The change in tota
 <pre>
 
 </pre>
-### **Oppgave 3: Lag en månedlig salgrapport på aggregert nivå.**
-
-
-Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå
-sammen
-
-Belyse om det er sammenheng mellom ledighet i området og omsetning
-Belyse om det er sammenheng mellom demo i området og omsetning Belyse om
-det er sammenheng mellom crime i området og omsetning
+### **Oppgave 3: Lag en månedlig salgrapport på aggregert nivå.**  
+<br/>
 
 #### **Introduction**  
 In a monthly report, the group management will be able to see the total results of the business and make strategic assessments based on this. This means that Sales and Profits in total and per Store are central. On the basis of this, it will be possible to assess whether special measures are necessary for some Stores. Comparison of data on the same item across Stores will also be relevant. This can form the basis for looking at whether the product range should be the same in all Stores.  
@@ -695,7 +688,7 @@ We see from Figure 3a that the largest share of total Sales is achieved by `r Sh
   
 #### **Making a plot of profit on mostselling items:**
 
-```{r plot figure 4profit per item}
+```{r plot figure 4 profit per item}
 # Profit as share of total Profit
 figure_4 <-
   amount_shares_item_mnd %>% 
@@ -711,6 +704,86 @@ figure_4
 ```
 
 **Comment**  
-We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most_item_mnd[1,1]`. This item has `r profit_most_item_mnd[1,7]` percent of total Profit.
+We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most_item_mnd[1,1]`. This item has `r profit_most_item_mnd[1,7]` percent of total Profit.  
+<br/>
 
+#### **Aggregating per Store**
+```{r Aggregating per Store}
+Store_mnd <- All_df_rev %>% 
+  filter(Week_No >= 40, Week_No <= 43) %>% 
+  group_by(Store_Num,Store_Name, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+           County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,                                          County_Hispanic_Native_American_pct, County_Hispanic_White_pct, `County_Non-Hispanic_Native_American_pct`,                   All_Other_Groups_pct) %>%
+  
+  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, 
+            Store_Name_Profit = sum(Profit)/1000) %>% 
+  # making shares NB får beskjed om at Store_mnd ikke fins. Har tatt ut Store_mnd så alle andelkolonner viser 100
+  mutate(store_share_sold_mnd = round(100 *(Store_Name_Sold/sum(Store_Name_Sold)),1),
+         store_share_sales_mnd = round(100 *(Store_Name_Sale/sum(Store_Name_Sale)),1),
+         store_share_profit_mnd = round(100 *(Store_Name_Profit/sum(Store_Name_Profit)),1)) %>% 
+  
+  # creates the desired order of the variables
+  select(Store_Num,Store_Name,Store_Name_Sold, store_share_sold_mnd, Store_Name_Sale,store_share_sales_mnd,
+         Store_Name_Profit, store_share_profit_mnd,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+         County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+         County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
+  rename(other_demo_groups_pct = All_Other_Groups_pct,
+         sold = Store_Name_Sold,
+         sold_share = store_share_sold_mnd,
+         sales = Store_Name_Sale,
+         sales_share = store_share_sales_mnd,
+         profit = Store_Name_Profit,
+         profit_share = store_share_profit_mnd) %>% 
+  ungroup()
+Store_mnd
+```
+```{r}
+sum(Store_mnd$sold)
+sum(Store_mnd$sales)
+sum(Store_mnd$profit)
+
+#We make a table of amount and shares for each Store
+amount_shares_store_mnd <- Store_mnd[,1:8 ]
+kable(amount_shares_store_mnd, caption = "Table 7: Amount and shares for Sold, Sales and Profit per Store. In $1000.")
+```
+```{r arranging economic variables}
+# max of the economic variables
+Store_most_sold <- Store_mnd %>% 
+  arrange(desc(sold))
+
+Store_most_sales <- Store_mnd %>% 
+  arrange(desc(sales))
+
+Store_most_profit <- Store_mnd %>% 
+  arrange(desc(profit))
+```
+
+**Comment**  
+We see from Table 7 that the store with the largest sales was `r Store_most_sales[1,2]`. The amount was `r Store_most_sales[1,5]` and was `r Store_most_sales[1,6]` percent of the total sales for all the stores.  
+
+#### **Correlation between the variables**
+```{r correlations between the variables}
+
+# Preparing the dataset for regression
+res_store_mnd <- Store_mnd %>% 
+  select(sales,County_Total_Crime_Rate, 
+         County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+         County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, other_demo_groups_pct)
+  
+res_store_tbl <- round(cor(res_store_mnd),2)
+res_store_tbl
+```
+
+**Comment**
+We see from the data following:
+
+
+#### **Summary**
+
+
+Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå
+sammen
+
+Belyse om det er sammenheng mellom ledighet i området og omsetning
+Belyse om det er sammenheng mellom demo i området og omsetning Belyse om
+det er sammenheng mellom crime i området og omsetning
 

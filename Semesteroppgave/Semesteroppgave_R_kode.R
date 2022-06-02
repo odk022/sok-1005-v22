@@ -601,33 +601,82 @@ figure_4
 # Belyse om det er sammenheng mellom demo i området og omsetning Belyse om
 # det er sammenheng mellom crime i området og omsetning
 
-test_shop <- All_df_rev %>% 
+# making aggregate sum per Store
+Store_mnd <- All_df_rev %>% 
   filter(Week_No >= 40, Week_No <= 43) %>% 
-  select(Store_Name, Store_Num,Description, Sold, Sales, Profit, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+  # select(Store_Name, Store_Num,Description, Sold, Sales, Profit, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+  #        County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+  #        County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
+  group_by(Store_Num,Store_Name, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+           County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+           County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>%
+  
+  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, Store_Name_Profit = sum(Profit)/1000) %>% 
+  # making shares
+  mutate(store_share_sold_mnd = round(100 *(Store_Name_Sold/sum(Store_mnd$Store_Name_Sold)),1),
+         store_share_sales_mnd = round(100 *(Store_Name_Sale/sum(Store_mnd$Store_Name_Sale)),1),
+         store_share_profit_mnd = round(100 *(Store_Name_Profit/sum(Store_mnd$Store_Name_Profit)),1)) %>% 
+  
+  # creates the desired order of the variables
+  select(Store_Num,Store_Name,Store_Name_Sold, store_share_sold_mnd, Store_Name_Sale,store_share_sales_mnd,
+         Store_Name_Profit, store_share_profit_mnd,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
          County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
          County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
-  group_by(Store_Name,Sold, Sales, Profit) %>%
-  summarise(Sales)
-ungroup()
+  rename(other_demo_groups_pct = All_Other_Groups_pct) %>% 
+  ungroup()
+Store_mnd
 
-test_shop_1 <- test_shop %>% 
-  group_by(Store_Name, Sales) %>% 
-  mutate(Store_Name_Sale = sum(Sales)) 
+sum(Store_Name_Sold)
 
-#teste ut salg pr butikk
-
-sum(test_shop$Sales)
-
-
-
-# Hva vil du her
-# En kolonne for hver butikk
-#rader:Sales pr uke,Profit pr uke mer?
+sum(Store_mnd$Store_Name_Sale)
+sum(Store_mnd$Store_Name_Profit)
 
 
 
 
- 
+# table
+
+Store_most_sold <- Store_mnd %>% 
+  arrange(desc(Store_Name_Sold))
+Store_most_sold
+
+Store_most_sales <- Store_mnd %>% 
+  arrange(desc(Store_Name_Sale))
+Store_most_sales
+
+Store_most_profit <- Store_mnd %>% 
+  arrange(desc(Store_Name_Profit))
+Store_most_profit
+
+
+  
+ggplot(Store_mnd, aes(Store_Name_Sale,County_Hispanic_White_pct, color = Store_Name)) +
+  geom_point()
+
+library(mosaic)
+reg_line_1 <- lm(County_Total_Crime_Rate ~ Store_Name_Sale, data = Store_mnd)
+reg_line_1
+
+reg_line_2 <- lm(County_Hispanic_White_pct ~ Store_Name_Sale, data = Store_mnd)
+reg_line_2
+
+
+# # Is there any correlation between Sales and other variables
+
+# Preparing the datasett for regression
+res_store_mnd <- Store_mnd %>% 
+  select(Store_Name_Sale,County_Total_Crime_Rate, 
+         County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+         County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, other_demo_groups_pct)
+  
+res_store <- round(cor(res_store_mnd),2)
+res_store
+
+# Table over regression
+#Comment
+
+#Summary
+
 # OPPGAVE 4:
 # Kan dataene benyttes til å planlegge nye utsalg? Dersom konsernledelsen ønsker å 
 # etablere et nytt utsalg, hvordan kan de benytte disse dataene til å finne den beste lokasjonen?
