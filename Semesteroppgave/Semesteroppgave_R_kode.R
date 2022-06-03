@@ -502,10 +502,16 @@ profit_share_most_pricegroup_mnd
 amount_shares_pricegroup_mnd <- amount_share_pricegroup_mnd[1:9, ]
 #kable(amount_shares_mnd, caption = "Table 4: Amount and shares for Sale and Profit")
 
+# bestselling items in pricegroup
+bestselling_pricegroup_item <- 
+  sales_Description_mnd %>% 
+  filter(price_group%in%sales_most_pricegroup_mnd) %>% 
+  arrange(desc(Tot_sold))
+bestselling_pricegroup_item
 
-
-
-
+# We make a table of the 10 bestselling items in pricegroup $5
+bestselling_pricegroup_item <- bestselling_pricegroup_item[1:10, ]
+#kable(bestselling_pricegroup_item, caption = "Table 5: Most sold items in price group $5 ")
 
 # amount and shares of Sales and Profit per item
 amount_share_item_mnd <-
@@ -517,17 +523,7 @@ amount_share_item_mnd <-
 amount_share_item_mnd
 
 
-#Lage noe på dette
-# bestselling items in pricegroup 5
-bestselling_pgr_5 <-
-  amount_share_item_mnd %>% 
-  filter(price_group == "price_$5") %>% 
-  arrange(desc(Tot_sold))
-bestselling_pgr_5
 
-# We make a table of the 10 bestselling items in pricegroup $5
-bestselling_pgr_5 <- bestselling_pgr_5[1:10, ]
-#kable(bestselling_pgr_5, caption = "Table 5: Most sold items in price group $5 ")
 
 
 # Amount of Sales
@@ -594,12 +590,7 @@ figure_4 <-
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 figure_4
 
-# Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå
-# sammen
-# 
-# Belyse om det er sammenheng mellom ledighet i området og omsetning
-# Belyse om det er sammenheng mellom demo i området og omsetning Belyse om
-# det er sammenheng mellom crime i området og omsetning
+
 
 # making aggregate sum per Store
 Store_mnd <- All_df_rev %>% 
@@ -613,39 +604,43 @@ Store_mnd <- All_df_rev %>%
   
   summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, Store_Name_Profit = sum(Profit)/1000) %>% 
   # making shares
-  mutate(store_share_sold_mnd = round(100 *(Store_Name_Sold/sum(Store_mnd$Store_Name_Sold)),1),
-         store_share_sales_mnd = round(100 *(Store_Name_Sale/sum(Store_mnd$Store_Name_Sale)),1),
-         store_share_profit_mnd = round(100 *(Store_Name_Profit/sum(Store_mnd$Store_Name_Profit)),1)) %>% 
+  mutate(sold_share = round(100 *(Store_Name_Sold/sum(Store_mnd$Store_Name_Sold)),1),
+         sales_share = round(100 *(Store_Name_Sale/sum(Store_mnd$Store_Name_Sale)),1),
+         profit_share = round(100 *(Store_Name_Profit/sum(Store_mnd$Store_Name_Profit)),1)) %>% 
   
   # creates the desired order of the variables
-  select(Store_Num,Store_Name,Store_Name_Sold, store_share_sold_mnd, Store_Name_Sale,store_share_sales_mnd,
-         Store_Name_Profit, store_share_profit_mnd,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+  select(Store_Num,Store_Name,Store_Name_Sold, sold_share, Store_Name_Sale,sales_share,
+         Store_Name_Profit, profit_share,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
          County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
          County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
-  rename(other_demo_groups_pct = All_Other_Groups_pct) %>% 
+  rename(other_demo_groups_pct = All_Other_Groups_pct,
+         sold = Store_Name_Sold,
+         sales = Store_Name_Sale,
+         profit = Store_Name_Profit) %>%  
   ungroup()
 Store_mnd
 
-sum(Store_Name_Sold)
+sum(Store_mnd$sold)
 
-sum(Store_mnd$Store_Name_Sale)
-sum(Store_mnd$Store_Name_Profit)
+sum(Store_mnd$sales)
+sum(Store_mnd$profit)
 
 
 
 
 # table
 
+# max of the economic variables
 Store_most_sold <- Store_mnd %>% 
-  arrange(desc(Store_Name_Sold))
+  arrange(desc(sold))
 Store_most_sold
 
 Store_most_sales <- Store_mnd %>% 
-  arrange(desc(Store_Name_Sale))
+  arrange(desc(sales))
 Store_most_sales
 
 Store_most_profit <- Store_mnd %>% 
-  arrange(desc(Store_Name_Profit))
+  arrange(desc(profit))
 Store_most_profit
 
 
@@ -660,6 +655,15 @@ reg_line_1
 reg_line_2 <- lm(County_Hispanic_White_pct ~ Store_Name_Sale, data = Store_mnd)
 reg_line_2
 
+# Looking at the non-economic variables
+non_ec_var <- Store_mnd %>% 
+  select(Store_Num,Store_Name, sold,sales,profit, Store_Location, Store_Drive_Through) %>% 
+  arrange(desc(sales))
+non_ec_var
+
+#Comment
+#We see that only the store with the highest sales is located as Free Standing. This store also has Store_Drive_Through 
+#as one of two in the dataset. These factors can be important framework conditions for localization because they clearly affect sales.
 
 # # Is there any correlation between Sales and other variables
 

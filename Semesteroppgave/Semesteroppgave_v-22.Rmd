@@ -1,8 +1,11 @@
 ---
 title: "Semesteroppgave SOK-1005-v22"
 author: "Oddmund Klæboe"
-date: "18 5 2022"
-output: html_document
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: true
+  
 editor_options: 
   markdown: 
     wrap: 72
@@ -17,16 +20,9 @@ library(knitr)
 
 ```
 
-### **Oppgave 1: Slå sammen alle datasettene**  
+## **Oppgave 1: Slå sammen alle datasettene**
 
-
-
-
-Tenkte å lage det slik at man kunne velge butikk/butikknr og velge
-uke(r) for å få de tallene man ønsker  
-
-
-**Downloading data**
+<br/> **Downloading data**
 
 ```{r downloads}
 file_location <- paste0(getwd(), '/')
@@ -71,10 +67,10 @@ rm(list=ls())
 - county_demographic = df3_demo\
 - county_employment = df4_em\
 - weekly_weather = df5_weather\
-- weekly_sales_10stores = df6_sales  
+- weekly_sales_10stores = df6_sales
 
-<br/>
-**I go through the dfs and make necessary changes in names and formats:**
+<br/> **I go through the dfs and make necessary changes in names and
+formats:**
 
 ```{r renaming and going through the dfs}
 # some changes
@@ -123,7 +119,6 @@ df6_sales_3
 
 ```
 
-
 **I make one df out of alle df by using the function left_join():**
 
 ```{r merging dfs}
@@ -139,10 +134,13 @@ All_df <- All_df %>%
   filter(Cost > 0) 
 All_df
 ```
+
+```{=html}
 <pre>
 
 </pre>
-### **Oppgave 2: Lag en ukesrapport for et utsalg**
+```
+## **Oppgave 2: Lag en ukesrapport for et utsalg**
 
 ```{r links_to_name_and_period}
 # Store Name
@@ -154,11 +152,22 @@ Week <- All_df %>%
   filter(Weather_Week == 20) 
 ```
 
-This is a weekly report for store no `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` for the period week no `r Week[1,22]` which gives a overview and assessment of the results.  
+This is a weekly report for store no `r Store_No_Nm[1,2]`
+`r Store_No_Nm[1,1]` for the period week no `r Week[1,22]` which gives a
+overview and assessment of the results.
 
-A weekly sales report will be a status report of how the operations in a sale are going. Here, key issues will be how sales of various goods have been and on which goods the profit has been greatest.   
-The dataset includes many types of items. It has therefore been chosen to divide the product range into price groups and look at which price group has the largest Sale and Profit. Here it is also looked at which item is sold the most within the price group with the largest Sales. It has also been chosen to look at goods with the lowest turnover, and this can be helpful in assessing whether to maintain the large breadth of the product range.   
-It must be added that the Profit is Gross Profit so that there will not be a supplementary analysis.
+A weekly sales report will be a status report of how the operations in a
+sale are going. Here, key issues will be how sales of various goods have
+been and on which goods the profit has been greatest.\
+The dataset includes many types of items. It has therefore been chosen
+to divide the product range into price groups and look at which price
+group has the largest Sale and Profit. Here it is also looked at which
+item is sold the most within the price group with the largest Sales. It
+has also been chosen to look at goods with the lowest turnover, and this
+can be helpful in assessing whether to maintain the large breadth of the
+product range.\
+It must be added that the Profit is Gross Profit so that there will not
+be a supplementary analysis.
 
 ```{r selecting variables for week report}
 # selecting week and Store
@@ -209,17 +218,28 @@ profit_change = round(100 * ((sum(sales_14_20$Profit)/sum(sales_14_19$Profit)-1)
 profit_change
 ```
 
-**Comment**  
-Total revenues of Sales for store `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]`  i week `r Week[1,22]` were \$ `r sum(sales_14_20$Sales)`. The total sales changed `r sales_change` percent compared to the week before.  
-Total profit in the same period were \$ `r sum(sales_14_20$Profit)`. The change in total profit from the week before were  `r profit_change` percent.   
-Sales revenues were greatest for `r sales_most_item[1,2]`. Total sales for this were \$ `r sales_most_item[1,8]`.
-The most profitable item were `r Profit_most_item[1,2]`. For this, the total profit were \$ `r Profit_most_item[1,6]`.  
+**Comment**\
+Total revenues of Sales for store `r Store_No_Nm[1,2]`
+`r Store_No_Nm[1,1]` i week `r Week[1,22]` were \$
+`r sum(sales_14_20$Sales)`. The total sales changed `r sales_change`
+percent compared to the week before.\
+Total profit in the same period were \$ `r sum(sales_14_20$Profit)`. The
+change in total profit from the week before were `r profit_change`
+percent.\
+Sales revenues were greatest for `r sales_most_item[1,2]`. Total sales
+for this were \$ `r sales_most_item[1,8]`. The most profitable item were
+`r Profit_most_item[1,2]`. For this, the total profit were \$
+`r Profit_most_item[1,6]`.
 
-<br/>  
+<br/>
 
 #### **Sorting the goods after price groups:**
 
-Due to the large breadth of the product range, it has been chosen to take the product prices as a starting point for the analysis and group them. They are sorted in following groups. Price below \$1(here are also refund etc that is negative figures), between \$1 and \$2, and so on. The last price group is price over \$8.
+Due to the large breadth of the product range, it has been chosen to
+take the product prices as a starting point for the analysis and group
+them. They are sorted in following groups. Price below \$1(here are also
+refund etc that is negative figures), between \$1 and \$2, and so on.
+The last price group is price over \$8.
 
 ```{r sorting price in groups}
 sales_price_gr <- sales_14_20 %>% 
@@ -257,7 +277,6 @@ profit_most <-
   subset(sales_price_gr, Tot_profit == max(sales_price_gr$Tot_profit))
 ```
 
-
 #### **Share of sales and profit per pricegroup:**
 
 ```{r shares of sales and profit}
@@ -276,8 +295,13 @@ Shares_most <-
 Goods_shares <- sales_share[1:9, ]
   kable(Goods_shares, caption = "Table 1: Amount and shares for Sale and Profit")
 ```
-**Comment**  
-We see from table 1 the highest revenue comes from sale in the pricegroup `r Shares_most[1,1]`. The sales here are \$ `r Shares_most[1,3]` and profit are \$ `r Shares_most[1,5]`. This pricegoup has a share of `r Shares_most[1,4]` percent of total Sale and `r Shares_most[1,6]` percent of total Profit.  
+
+**Comment**\
+We see from table 1 the highest revenue comes from sale in the
+pricegroup `r Shares_most[1,1]`. The sales here are \$
+`r Shares_most[1,3]` and profit are \$ `r Shares_most[1,5]`. This
+pricegoup has a share of `r Shares_most[1,4]` percent of total Sale and
+`r Shares_most[1,6]` percent of total Profit.
 
 <br/>
 
@@ -296,11 +320,14 @@ figure_1
 
 ```
 
-**Comment**  
-We see from Figure 1 that the highest sales are of goods in the price group `r sales_most[1,1]`. Total Sales are \$`r sales_most[1,2]`. The first price group has negative sales figures. The reason for this is that it also contains refunds etc.  
+**Comment**\
+We see from Figure 1 that the highest sales are of goods in the price
+group `r sales_most[1,1]`. Total Sales are \$`r sales_most[1,2]`. The
+first price group has negative sales figures. The reason for this is
+that it also contains refunds etc.\
 <br/>
 
-#### **Making a plot of shares of sales per pricegroup:**
+### **Plot of shares of sales per pricegroup:**
 
 ```{r figure 1a share of sales}
 figure_1a <-
@@ -314,11 +341,13 @@ figure_1a <-
 figure_1a
 ```
 
-**Comment**  
-We see from Figure 1a that the highest share of sales are of goods in the price group `r Shares_most[1,1]`. This price group has `r Shares_most[1,4]` per cent of all sales.  
+**Comment**\
+We see from Figure 1a that the highest share of sales are of goods in
+the price group `r Shares_most[1,1]`. This price group has
+`r Shares_most[1,4]` per cent of all sales.\
 <br/>
 
-#### **Making a plot of profit per pricegroup:**
+### **Plot of profit per pricegroup:**
 
 ```{r figure 2 profit}
 figure_2 <-
@@ -332,14 +361,17 @@ figure_2 <-
 figure_2
 ```
 
-**Comment**  
-We see from Figure 2 that the largest profit is achieved from sales in the price group `r profit_most [1,1]`. The total profit here is \$ `r profit_most [1,4]`. The first price group is negative. The reason for this is that it also contains refunds etc. who will negatively affect profits.  
+**Comment**\
+We see from Figure 2 that the largest profit is achieved from sales in
+the price group `r profit_most [1,1]`. The total profit here is \$
+`r profit_most [1,4]`. The first price group is negative. The reason for
+this is that it also contains refunds etc. who will negatively affect
+profits.\
 <br/>
 
-#### **The best-selling items**
+### **The best-selling items**
 
-
-```{r best selling}
+```{r best selling item}
 # Highest number of items sold
 Goods_most<- sales_14_20 %>% 
   filter(Sold > 10) %>% 
@@ -368,19 +400,29 @@ Goods_most <- Goods_most[1:10, ]
   kable(Goods_most, caption = "Table 2: Most sold items")
 ```
 
-**Comment**  
-Table 2 shows the 10 items that sell the most in Store `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` in this week. Sales for these 10 are total $ `r sum(Goods_most$Sales)` and account for `r round(100 *(sum(Goods_most$Sales)/sum(sales_14_20$Sales)),1)` percent of total sales.
+**Comment**
+Table 2 shows the 10 items that sell the most in Store
+`r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` in this week. Sales for these
+10 are total $ `r sum(Goods_most$Sales)` and account for
+`r round(100 *(sum(Goods_most$Sales)/sum(sales_14_20$Sales)),1)` percent
+of total sales.
 
-It appears from Table 2 that the mostselling item were `r Goods_most [1,2]`.  `r Goods_most [1,4]` units of `r Goods_most [1,2]` were sold. That account for $`r Goods_most[1,8]` in sale. The sale of `r Goods_most[1,2]` accounts for `r round(100 *(Goods_most[1,8]/sum(sales_14_20$Sales)),1)` percent of total Sales.
+It appears from Table 2 that the mostselling item were
+`r Goods_most [1,2]`. `r Goods_most [1,4]` units of `r Goods_most [1,2]`were sold. That account for
+$`r Goods_most[1,8]` in sale. The sale of `r Goods_most[1,2]` accounts for $`r round(100 *(Goods_most[1,8]/sum(sales_14_20$Sales)),1)` percent of total Sales.
 
-In second place we find `r Goods_most[2,2]` with `r Goods_most[2,4]` units and $ `r Goods_most[2,8]` of sale. As third ranked, we find `r Goods_most[3,2]` with `r Goods_most[3,4]` units and $ `r Goods_most[3,8]` of sale.
+In second place we find `r Goods_most[2,2]` with `r Goods_most[2,4]`
+units and \$ `r Goods_most[2,8]` of sale. As third ranked, we find
+`r Goods_most[3,2]` with `r Goods_most[3,4]` units and \$
+`r Goods_most[3,8]` of sale.
 
- 
-`r Goods_most_p[1,2]` is the most profitable sold item. The profit is \$ `r Goods_most[1,6]`. This amounts to
-`r round(100 *(Goods_most_p[1,6]/sum(sales_14_20$Profit)),1)` percent of total profit.  
+`r Goods_most_p[1,2]` is the most profitable sold item. The profit is \$
+`r Goods_most[1,6]`. This amounts to
+`r round(100 *(Goods_most_p[1,6]/sum(sales_14_20$Profit)),1)` percent of
+total profit.
 <br/>
 
-#### **The lowest sales**
+### **The lowest sales**
 
 ```{r low sales}
 # lowest number of items sold
@@ -406,32 +448,58 @@ Goods_lowest_p
 Goods_low <- Goods_low[1:10, ]
   kable(Goods_low, caption = "Table 3: lowest number sold items")
 ```
-**Comment**  
-From table 3 we see that there are many items that not are selling good.  
+
+**Comment**
+From table 3 we see that there are many items that not are selling
+good.
 <br/>
-  
 
-#### **Summary:**  
-The week sales report for Store `r Store_No_Nm[1,2]` `r Store_No_Nm[1,1]` in week `r Week[1,22]`show that total revenues for 
-were \$ `r sum(sales_14_20$Sales)`, and total Profit were \$ `r sum(sales_14_20$Profit)`.  
-The most-selling item were `r sales_most_item[1,2]`. Total sales for this were \$ `r sales_most_item[1,8]`. The total sales changed `r sales_change` percent compared to the week before.  
-The most profitable item were `r Profit_most_item[1,2]`.
-For this, the total profit were \$ `r Profit_most_item[1,6]`. The change in total profit from the week before were \ `r profit_change` percent.  
+### **Summary:**
 
+The week sales report for Store `r Store_No_Nm[1,2]`
+`r Store_No_Nm[1,1]` in week `r Week[1,22]`show that total revenues for
+were \$ `r sum(sales_14_20$Sales)`, and total Profit were \$
+`r sum(sales_14_20$Profit)`.\
+The most-selling item were `r sales_most_item[1,2]`. Total sales for
+this were \$ `r sales_most_item[1,8]`. The total sales changed
+`r sales_change` percent compared to the week before.\
+The most profitable item were `r Profit_most_item[1,2]`. For this, the
+total profit were \$ `r Profit_most_item[1,6]`. The change in total
+profit from the week before were  `r profit_change` percent.
+
+```{=html}
 <pre>
 
 </pre>
-### **Oppgave 3: Lag en månedlig salgrapport på aggregert nivå.**  
+```
+## **Oppgave 3: Lag en månedlig salgrapport på aggregert nivå.**
+
 <br/>
 
-#### **Introduction**  
-In a monthly report, the group management will be able to see the total results of the business and make strategic assessments based on this. This means that Sales and Profits in total and per Store are central. On the basis of this, it will be possible to assess whether special measures are necessary for some Stores. Comparison of data on the same item across Stores will also be relevant. This can form the basis for looking at whether the product range should be the same in all Stores.  
+### **Introduction**
 
-It has been chosen here to divide the product range into price groups and look at which price group has the largest Sales and Profits. Here it is also looked at which item is sold the most within the price group with the largest Sales.  
+In a monthly report, the group management will be able to see the total
+results of the business and make strategic assessments based on this.
+This means that Sales and Profits in total and per Store are central. On
+the basis of this, it will be possible to assess whether special
+measures are necessary for some Stores. Comparison of data on the same
+item across Stores will also be relevant. This can form the basis for
+looking at whether the product range should be the same in all Stores.
 
-It has also been chosen to look at items with the lowest sales, which can be helpful in assessing whether to maintain the large breadth of the product range.  
+It has been chosen here to divide the product range into price groups
+and look at which price group has the largest Sales and Profits. Here it
+is also looked at which item is sold the most within the price group
+with the largest Sales.
 
-The dataset is not very suitable for creating real monthly data because it is based on weeks. It will be the case that a week can contain data for several months. It is therefore recommended that the group switch to a day-based accounting system so that monthly data can be created in a simpler way.  
+It has also been chosen to look at items with the lowest sales, which
+can be helpful in assessing whether to maintain the large breadth of the
+product range.
+
+The dataset is not very suitable for creating real monthly data because
+it is based on weeks. It will be the case that a week can contain data
+for several months. It is therefore recommended that the group switch to
+a day-based accounting system so that monthly data can be created in a
+simpler way.\
 <br/>
 
 **Cleaning the data set for unnecessary variable and grouping some
@@ -491,12 +559,20 @@ sales_mnd
 sum(sales_mnd$Sales)
 sum(sales_mnd$Profit)
 ```
-**Comment**  
-The total Sales revenue from all the Stores in this month were $`r (sum(sales_mnd$Sales))/1000`. Total Profit amounts to $`r (sum(sales_mnd$Profit))/1000`. All numbers are in thousands of $.  
+
+**Comment**\
+The total Sales revenue from all the Stores in this month were
+$`r (sum(sales_mnd$Sales))/1000`. Total Profit amounts to $`r
+(sum(sales_mnd\$Profit))/1000\`. All numbers are in thousands of \$.\
 <br/>
 
-#### **Sorting the goods after price groups:**  
-Due to the large breadth of the product range, it has been chosen to take the product prices as a starting point for the analysis and group them. They are sorted in following groups. Price below \$1(here are also refund etc that is negative figures), between \$1 and \$2, and so on. The last price group is price over \$8.
+### **Sorting the goods after price groups:**
+
+Due to the large breadth of the product range, it has been chosen to
+take the product prices as a starting point for the analysis and group
+them. They are sorted in following groups. Price below \$1(here are also
+refund etc that is negative figures), between \$1 and \$2, and so on.
+The last price group is price over \$8.
 
 ```{r sorting pricegroups for use on aggregate level}
 sales_price_gr_mnd <- sales_mnd %>% 
@@ -534,7 +610,7 @@ sales_Description_mnd <-
 sales_Description_mnd
 ```
 
-```{r}
+```{r sum of variables}
 # Total sales and profit:
 round(sum(price_gr_Sales_mnd$Tot_sales),0)
 round(max(price_gr_Sales_mnd$Tot_sales),0) 
@@ -544,7 +620,7 @@ round(max(price_gr_Sales_mnd$Tot_profit),0)
 
 ```
 
-#### **Amount and Share of Sales and Profit per price group:**
+### **Amount and Share of Sales and Profit per price group:**
 
 ```{r amount and shares of Sales and Profit}
 # amount and shares of Sales and Profit per price group
@@ -580,14 +656,41 @@ profit_share_most_pricegroup_mnd
 amount_shares_pricegroup_mnd <- amount_share_pricegroup_mnd[1:9, ]
 kable(amount_shares_pricegroup_mnd, caption = "Table 4: Amount and shares for Sale and Profit per price group")
 ```
-**Comment**  
-We see from Table 4 that the highest sales revenue comes from the price group `r amount_shares_pricegroup_mnd [1,1]`. The revenues were $ `r (sales_most_pricegroup_mnd [1,3])/1000`. The profit from sales in this price group was `r (profit_most_pricegroup_mnd [1,5])/1000`. All numbers are in thousands of $.  
 
-<br/>  
+**Comment**\
+We see from Table 4 that the highest sales revenue comes from the price
+group `r amount_shares_pricegroup_mnd [1,1]`. The revenues were \$
+`r (sales_most_pricegroup_mnd [1,3])/1000`. The profit from sales in
+this price group was `r (profit_most_pricegroup_mnd [1,5])/1000`. All
+numbers are in thousands of \$.
 
-#### **Amount and Share of Sales and Profit per item:**  
+<br/>
+
+```{r Item with highest Sale in price group}
+# bestselling items in price group with highest Sale
+bestselling_pricegroup_item <- 
+  sales_Description_mnd %>% 
+  filter(price_group%in%sales_most_pricegroup_mnd) %>% 
+  arrange(desc(Tot_sold))
+
+
+# We make a table of the 10 bestselling items in pricegroup
+bestselling_pricegroup_item <- bestselling_pricegroup_item[1:10, ]
+kable(bestselling_pricegroup_item, caption = "Table 5: Most sold items in price group ")
+```
+
+**Comment**
+
+We see from table 5 that the bestselling item in the price group that
+has the highest Sale is `r bestselling_pricegroup_item[1,1]`. In second
+place we find `r bestselling_pricegroup_item[2,1]`.
+
+<br/>
+
+### **Amount and Share of Sales and Profit per item:**
 
 ```{r Amount and Share of Sales and Profit per item}
+# Finding the overall bestselling item
 amount_share_item_mnd <-
   sales_Description_mnd %>% 
   mutate(Share_sales_mnd = round(100 *(Tot_sales/sum(sales_Description_mnd$Tot_sales)), 1),
@@ -596,21 +699,6 @@ amount_share_item_mnd <-
   arrange(desc(Tot_sales))
 amount_share_item_mnd
 ```
-SKAL DETTE MED?
-```{r bestseeling in pricegroup $5}
-# bestselling items in pricegroup 5
-bestselling_pgr_5 <-
-  amount_share_item_mnd %>% 
-  filter(price_group == "price_$5") %>% 
-  arrange(desc(Tot_sold))
-
-# We make a table of the 10 bestselling items in pricegroup $5
-bestselling_pgr_5 <- bestselling_pgr_5[1:10, ]
-kable(bestselling_pgr_5, caption = "Table 5: Most sold items in price group $5 ")
-```
-
-**Comment**  
-From table 5 we see that the item that sells the most is `r bestselling_pgr_5[1,1]` It was sold `r bestselling_pgr_5[1,3]` units of it in this month.
 
 ```{r Amount and Share of Sales and Profit per item 2}
 # Amount of Sales
@@ -638,12 +726,16 @@ amount_shares_item_mnd <- amount_share_item_mnd[1:10, ]
 kable(amount_shares_item_mnd, caption = "Table 6: Amount and shares for Sale and Profit per item")
 ```
 
-**Comment**  
+**Comment**
 
-We see from Table 6 that the highest sales revenue comes from the item `r amount_shares_item_mnd [1,1]`. The Sales revenue were $ `r (Shares_most_item_mnd [1,4])/1000`. The profit from sales of this item  was `r (profit_share_most_item_mnd  [1,6])/1000`. All numbers are in thousands of $.  
+We see from Table 6 that the highest sales revenue comes from the item
+`r amount_shares_item_mnd [1,1]`. The Sales revenue were \$
+`r (Shares_most_item_mnd [1,4])/1000`. The profit from sales of this
+item was `r (profit_share_most_item_mnd  [1,6])/1000`. All numbers are
+in thousands of \$.\
 <br/>
 
-#### **Making a plots of Sales of mostselling items:**
+### **Plot of Sales of mostselling items:**
 
 ```{r plot figure 3 sales revenue per mostselling items}
 # Sales pr item
@@ -660,11 +752,14 @@ figure_3 <-
 figure_3
 ```
 
-**Comment**  
-We see from Figure 3 that the largest Sales revenue is achieved by `r sales_most_item_mnd [1,1]`. The sales revenue from this item amounts to $`r (sales_most_item_mnd[1,4])/1000`. Numbers are in thousands of $.     
+**Comment**\
+We see from Figure 3 that the largest Sales revenue is achieved by
+`r sales_most_item_mnd [1,1]`. The sales revenue from this item amounts
+to \$`r (sales_most_item_mnd[1,4])/1000`. Numbers are in thousands of
+\$.\
 <br/>
 
-#### **Making a plot of Sales of mostselling items as shares of total Sales:**
+### **Plot of Sales of mostselling items as shares of total Sales:**
 
 ```{r plot figure 3a mostselling items shares}
 # Sales as shares of total Sales
@@ -681,12 +776,13 @@ figure_3a <-
 figure_3a
 ```
 
-**Comment**   
-We see from Figure 3a that the largest share of total Sales is achieved by `r Shares_most_item_mnd [1,1]`. This item has `r Shares_most_item_mnd [1,5]` percent of total Sales.  
+**Comment**\
+We see from Figure 3a that the largest share of total Sales is achieved
+by `r Shares_most_item_mnd [1,1]`. This item has
+`r Shares_most_item_mnd [1,5]` percent of total Sales.\
 <br/>
 
-  
-#### **Making a plot of profit on mostselling items:**
+### **Plot of profit on bestselling items:**
 
 ```{r plot figure 4 profit per item}
 # Profit as share of total Profit
@@ -703,48 +799,58 @@ figure_4 <-
 figure_4
 ```
 
-**Comment**  
-We see from Figure 4 that the largest profit is achieved from sales in the price group `r profit_most_item_mnd[1,1]`. This item has `r profit_most_item_mnd[1,7]` percent of total Profit.  
+**Comment**\
+We see from Figure 4 that the largest profit is achieved from sales in
+the price group `r profit_most_item_mnd[1,1]`. This item has
+`r profit_most_item_mnd[1,7]` percent of total Profit.\
 <br/>
 
-#### **Aggregating per Store**
+### **Aggregating per Store**
+
 ```{r Aggregating per Store}
+# making aggregate sum per Store
 Store_mnd <- All_df_rev %>% 
   filter(Week_No >= 40, Week_No <= 43) %>% 
+   select(Store_Name, Store_Num,Description, Sold, Sales, Profit, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+          County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+         County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
   group_by(Store_Num,Store_Name, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
-           County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,                                          County_Hispanic_Native_American_pct, County_Hispanic_White_pct, `County_Non-Hispanic_Native_American_pct`,                   All_Other_Groups_pct) %>%
-  
-  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, 
-            Store_Name_Profit = sum(Profit)/1000) %>% 
-  # making shares NB får beskjed om at Store_mnd ikke fins. Har tatt ut Store_mnd så alle andelkolonner viser 100
-  mutate(store_share_sold_mnd = round(100 *(Store_Name_Sold/sum(Store_Name_Sold)),1),
-         store_share_sales_mnd = round(100 *(Store_Name_Sale/sum(Store_Name_Sale)),1),
-         store_share_profit_mnd = round(100 *(Store_Name_Profit/sum(Store_Name_Profit)),1)) %>% 
+           County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+           County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
+
+  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, Store_Name_Profit = sum(Profit)/1000)
+
+  # making shares
+  Store_mnd <- Store_mnd %>% 
+  mutate(sold_share = round(100 *(Store_Name_Sold/sum(Store_mnd$Store_Name_Sold)),1),
+         sales_share = round(100 *(Store_Name_Sale/sum(Store_mnd$Store_Name_Sale)),1),
+         profit_share = round(100 *(Store_Name_Profit/sum(Store_mnd$Store_Name_Profit)),1)) %>% 
   
   # creates the desired order of the variables
-  select(Store_Num,Store_Name,Store_Name_Sold, store_share_sold_mnd, Store_Name_Sale,store_share_sales_mnd,
-         Store_Name_Profit, store_share_profit_mnd,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+  select(Store_Num,Store_Name,Store_Name_Sold, sold_share, Store_Name_Sale,sales_share,
+         Store_Name_Profit, profit_share,Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
          County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
          County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
   rename(other_demo_groups_pct = All_Other_Groups_pct,
          sold = Store_Name_Sold,
-         sold_share = store_share_sold_mnd,
          sales = Store_Name_Sale,
-         sales_share = store_share_sales_mnd,
-         profit = Store_Name_Profit,
-         profit_share = store_share_profit_mnd) %>% 
+         profit = Store_Name_Profit) %>%  
   ungroup()
 Store_mnd
 ```
-```{r}
+
+```{r sum og variables 2}
 sum(Store_mnd$sold)
 sum(Store_mnd$sales)
 sum(Store_mnd$profit)
+```
 
+```{r Table 7 Amount and shares for Sold, Sales and Profit per Store }
 #We make a table of amount and shares for each Store
 amount_shares_store_mnd <- Store_mnd[,1:8 ]
 kable(amount_shares_store_mnd, caption = "Table 7: Amount and shares for Sold, Sales and Profit per Store. In $1000.")
 ```
+
 ```{r arranging economic variables}
 # max of the economic variables
 Store_most_sold <- Store_mnd %>% 
@@ -757,10 +863,64 @@ Store_most_profit <- Store_mnd %>%
   arrange(desc(profit))
 ```
 
-**Comment**  
-We see from Table 7 that the store with the largest sales was `r Store_most_sales[1,2]`. The amount was `r Store_most_sales[1,5]` and was `r Store_most_sales[1,6]` percent of the total sales for all the stores.  
+**Comment**\
+We see from Table 7 that the store with the largest sales was
+`r Store_most_sales[1,2]`. The amount was \$`r Store_most_sales[1,5]` in
+thosand \$ and was `r Store_most_sales[1,6]` percent of the total sales
+for all the stores.\
+The store with the greatest Profit was `r Store_most_profit[1,2]`. It is
+calculated to \$`r Store_most_profit[1,7]` in thousand \$. It was
+`r Store_most_profit[1,2]` that had the highest share of the total
+Profit. `r Store_most_profit[1,2]` share was `r Store_most_profit[1,8]`
+percent. It must be emphasized that it is the gross profit that is
+calculated here.
 
-#### **Correlation between the variables**
+### **Plot of Sales and shares per Store**
+
+```{r Figure 5 sales shares per Store}
+# sales shares per Store}
+figure_5 <-
+  amount_shares_store_mnd %>% 
+  ggplot(aes(x= Store_Name, y = sales_share))+
+  geom_bar(stat= "identity", fill = "steelblue") +
+  geom_text(aes(label=sales_share), vjust= -0.3, size=3.5)+
+  labs(title = "Figure 5: Sales shares per Store in one month ", 
+       x = "Store name", y = "Sales shares in percent",
+       caption = "Figure 5 shows sales share of  total Sale per Store .") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+figure_5
+```
+
+**Comment**
+
+Figure 5 shows share of total Sales for all the stores. We see that
+there are large differences between the stores in the share of total
+Sales.
+
+<br/>
+
+### **Correlation between the variables**
+
+```{r Correlation between the non-economic variables}
+# Looking at the non-economic variables
+non_ec_var <- Store_mnd %>% 
+  select(Store_Num,Store_Name, sold,sales,profit, Store_Location, Store_Drive_Through) %>% 
+  arrange(desc(sales))
+non_ec_var
+```
+
+**Comment**\
+We see that only the store with the highest sales is located as Free
+Standing. This store also has Store_Drive_Through as one of two in the
+dataset. These factors can be important framework conditions for
+localization because they clearly affect sales.
+
+<br/> **Correlation**\
+The relationship between total sales and a number of variables in the
+data set has also been calculated. It must be emphasized that this will
+only apply to the values ​​in the selected month.
+
 ```{r correlations between the variables}
 
 # Preparing the dataset for regression
@@ -773,17 +933,70 @@ res_store_tbl <- round(cor(res_store_mnd),2)
 res_store_tbl
 ```
 
-**Comment**
-We see from the data following:
+**Comment**\
+We see from the data following:\
+From the regression table, we see that there are generally weak
+correlations between total sales and the other variables in the data
+set. It is only in relation to County_Unemployment_Rate that we can see
+a connection, but it is quite weak, only 0.41.\
+<br/>
 
+### **Summary**
 
-#### **Summary**
+It is chosen to use week number instead of month number because it
+corresponds to time data in other data sets.
 
+It is also chosen to use per \$ 1000 for the variables Sale and Profit.
 
-Hvem er kunder og hva spiser de (koble demogrupper og varegrupper) - slå
-sammen
+It has been chosen to group the data set into price groups to see where
+the focus of Sales is.
 
-Belyse om det er sammenheng mellom ledighet i området og omsetning
-Belyse om det er sammenheng mellom demo i området og omsetning Belyse om
-det er sammenheng mellom crime i området og omsetning
+We have shown that the total Sales are in the price group
+`r sales_most_pricegroup_mnd[1,1]` with sales
+\$`r sales_most_pricegroup_mnd[1,3]/1000`.
+`r sales_most_pricegroup_mnd[1,4]` percent of sales is made up of this
+price group.
 
+The highest profit is in the price group
+`r profit_share_most_pricegroup_mnd[1,1]` with
+\$`r profit_share_most_pricegroup_mnd[1,5]/1000` . The share of the
+total profit is `r profit_share_most_pricegroup_mnd[1,6]` percent. In
+this price group, it is `r bestselling_pricegroup_item[1,1]` that has
+the highest sales.
+
+We see that for total Sales, it is `r sales_most_item_mnd[1,1]` that has
+the highest sales with \$`r sales_most_item_mnd[1,4]/1000`.
+`r sales_most_item_mnd[1,1]` has `r sales_most_item_mnd[1,5]` percent of
+total sales. `r profit_most_item_mnd[1,1]` has
+`r profit_most_item_mnd[1,7]` percent of the total profit.
+
+We have looked at how the total sales are distributed among the stores
+and find that this month, it is No `r Store_most_sales[1,1]`
+`r Store_most_sales[1,2]` that has the highest sales with \$
+`r Store_most_sales[1,5]`. This represents `r Store_most_sales[1,6]`
+percent of total sales.
+
+An assessment has been made of non-economic variables such as location
+and drive-in solutions' possible impact on sales. It turns out that in
+this dataset with this choice of time period, it is likely to matter.
+
+A simple regression has also been carried out which shows that there is
+generally no connection between demographic variables and sales. The
+same applies to crime rates. There is a slight positive correlation
+between sales and the unemployment rate. This only applies to data in
+this data set as choosing a different time period may give a different
+result.
+
+```{=html}
+<pre>
+
+</pre>
+```
+## **Oppgave 4: Kan dataene brukes til å planlegge nye utsalg.**
+
+The data base that we have reviewed may indicate that it is better to
+establish stores outside a shopping center than inside. Together with
+the drive-in solution, it seems to provide good conditions for success.
+Besides this, there are so few connections between sales and other
+variables that it is difficult to recommend that emphasis be placed on
+an establishment strategy.
