@@ -595,15 +595,17 @@ figure_4
 # making aggregate sum per Store
 Store_mnd <- All_df_rev %>% 
   filter(Week_No >= 40, Week_No <= 43) %>% 
-  # select(Store_Name, Store_Num,Description, Sold, Sales, Profit, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
-  #        County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
-  #        County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
+   select(Store_Name, Store_Num,Description, Sold, Sales, Profit, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
+          County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
+         County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
   group_by(Store_Num,Store_Name, Store_Location, Store_Drive_Through, Store_Competition_Fastfood,
            County_Total_Crime_Rate, County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
-           County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>%
-  
-  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, Store_Name_Profit = sum(Profit)/1000) %>% 
+           County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, All_Other_Groups_pct) %>% 
+
+  summarise(Store_Name_Sold = sum(Sold), Store_Name_Sale = sum(Sales)/1000, Store_Name_Profit = sum(Profit)/1000)
+
   # making shares
+  Store_mnd <- Store_mnd %>% 
   mutate(sold_share = round(100 *(Store_Name_Sold/sum(Store_mnd$Store_Name_Sold)),1),
          sales_share = round(100 *(Store_Name_Sale/sum(Store_mnd$Store_Name_Sale)),1),
          profit_share = round(100 *(Store_Name_Profit/sum(Store_mnd$Store_Name_Profit)),1)) %>% 
@@ -626,9 +628,21 @@ sum(Store_mnd$sales)
 sum(Store_mnd$profit)
 
 
-
+amount_shares_store_mnd <- Store_mnd[,1:8 ]
 
 # table
+
+figure_5 <-
+  amount_shares_store_mnd %>% 
+  ggplot(aes(x= Store_Name, y = sales_share))+
+  geom_bar(stat= "identity", fill = "steelblue") +
+  geom_text(aes(label=sales_share), vjust= -0.3, size=3.5)+
+  labs(title = "Figure 5: Sales shares per Store in one month ", 
+       x = "Store name", y = "Sales shares in percent",
+       caption = "Figure 5 shows sales share of  total Sale per Store .") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+figure_5
 
 # max of the economic variables
 Store_most_sold <- Store_mnd %>% 
