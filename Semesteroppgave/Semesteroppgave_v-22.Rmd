@@ -23,7 +23,7 @@ library(knitr)
 
 ```
 ## **Introduction**
-It is important to create reports so that they can be easily updated with new data when they are available. It is also an advantage if you can exchange data on the same topic, for example new time periods.  
+It is important to create reports so that they can be easily updated with new data when they are available. It is also an advantage if you can change data on the same topic, for example new time periods.  
 In this thesis I have tried to make the analysis as reproducible as possible by inserting 'r code' in the text instead of names and numbers.
 This means that at the beginning of Oppgave 2, section 0.3.1.1, you can choose the store number and name as well as the week number.
 In the beginning of Oppgave 3, section 0.4.2.1, you can choose the weekly interval you want to analyze.
