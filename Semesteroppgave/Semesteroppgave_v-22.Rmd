@@ -30,6 +30,7 @@ In the beginning of Oppgave 3, section 0.4.2.1, you can choose the weekly interv
 
 
 
+
 ## **Oppgave 1: Slå sammen alle datasettene**
 
 <br/> 
