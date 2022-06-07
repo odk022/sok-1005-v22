@@ -23,6 +23,9 @@ library(knitr)
 
 ```
 
+
+
+
 ## **Oppgave 1: Slå sammen alle datasettene**
 
 <br/> **Downloading data**

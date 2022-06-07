@@ -1,4 +1,4 @@
-# Loading necessary packages:
+s# Loading necessary packages:
 library(tidyverse)
 library(lubridate)
 library(kableExtra)
@@ -658,15 +658,11 @@ Store_most_profit <- Store_mnd %>%
 Store_most_profit
 
 
-  
-ggplot(Store_mnd, aes(Store_Name_Sale,County_Hispanic_White_pct, color = Store_Name)) +
-  geom_point()
-
 library(mosaic)
-reg_line_1 <- lm(County_Total_Crime_Rate ~ Store_Name_Sale, data = Store_mnd)
+reg_line_1 <- lm(County_Total_Crime_Rate ~ sales, data = Store_mnd)
 reg_line_1
 
-reg_line_2 <- lm(County_Hispanic_White_pct ~ Store_Name_Sale, data = Store_mnd)
+reg_line_2 <- lm(County_Hispanic_White_pct ~ sales, data = Store_mnd)
 reg_line_2
 
 # Looking at the non-economic variables
@@ -683,7 +679,7 @@ non_ec_var
 
 # Preparing the datasett for regression
 res_store_mnd <- Store_mnd %>% 
-  select(Store_Name_Sale,County_Total_Crime_Rate, 
+  select(sales,County_Total_Crime_Rate, 
          County_Unemployment_Rate, `County_Non-Hispanic_White_pct`,County_Hispanic_Native_American_pct, 
          County_Hispanic_White_pct,`County_Non-Hispanic_Native_American_pct`, other_demo_groups_pct)
   
