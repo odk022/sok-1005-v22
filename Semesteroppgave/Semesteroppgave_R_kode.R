@@ -694,7 +694,7 @@ res_store
 # OPPGAVE 4:
 # Kan dataene benyttes til å planlegge nye utsalg? Dersom konsernledelsen ønsker å 
 # etablere et nytt utsalg, hvordan kan de benytte disse dataene til å finne den beste lokasjonen?
-# se analysen under pkt 3
+# Se markdownfil 
 
 
 
